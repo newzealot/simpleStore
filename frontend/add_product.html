@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>simpleStore - Add Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+</head>
+<body>
+    <main class="container">
+        <h1>Add Product</h1>
+            <section class="container">
+                <form class= enctype='multipart/form-data' method='POST' action=''>
+                    <div class="m-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" placeholder="Metal Straw">
+                    </div>
+                    <div class="m-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="5" placeholder="This straw is 8 inches long..."></textarea>
+                    </div>
+                    <div class="m-3">
+                        <label for="media" class="form-label">Media</label>
+                        <input class="form-control" type="file" name='files[]' id="media" aria-describedby="mediaHelp" multiple>
+                        <div id="mediaHelp" class="form-text">Hold Ctrl or Command to select multiple files.</div>
+                    </div>
+                    <div class="m-3">
+                        <label for="sellingprice" class="form-label">Selling Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="sellingprice" min="0.00" step="0.01" value="0.00">
+                        </div>
+                    </div>
+                    <div class="m-3">
+                        <label for="originalprice" class="form-label">Original Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="originalprice" min="0.00" step="0.01" value="0.00">
+                        </div>
+                    </div>
+                    <div class="m-3">
+                        <label for="costprice" class="form-label">Cost Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="costprice" min="0.00" step="0.01" value="0.00">
+                        </div>
+                    </div>
+                    <div class="m-3">
+                        <label for="quantityleft" class="form-label">Quantity Left</label>
+                        <input type="number" class="form-control" id="quantityleft" value="0">
+                    </div>
+<!--                    # For next iteration-->
+<!--                    <div class="form-check m-3">-->
+<!--                        <input class="form-check-input" type="checkbox" value="" id="physicalproduct" checked>-->
+<!--                        <label class="form-check-label" for="physicalproduct">-->
+<!--                            This is a physical product-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                    <div class="m-3">-->
+<!--                        <label for="sku" class="form-label">SKU (Stock Keeping Unit)</label>-->
+<!--                        <input type="text" class="form-control" id="sku" placeholder="10 Pieces Pack">-->
+<!--                    </div>-->
+<!--                    <div class="m-3">-->
+<!--                        <label for="barcode" class="form-label">Barcode</label>-->
+<!--                        <input type="text" class="form-control" id="barcode" placeholder="9781680507607">-->
+<!--                    </div>-->
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+</body>
+</html>
