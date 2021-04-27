@@ -9,48 +9,48 @@
     <main class="container">
         <h1>Add Product</h1>
             <section class="container">
-                <form class= enctype='multipart/form-data' method='POST' action=''>
+                <form class= enctype='multipart/form-data' method='POST' action='/api/v1/product'>
                     <div class="m-3">
                         <label for="title" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="title" placeholder="Metal Straw">
+                        <input type="text" class="form-control" name="name" id="title" placeholder="Metal Straw">
                     </div>
                     <div class="m-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" rows="5" placeholder="This straw is 8 inches long..."></textarea>
+                        <textarea class="form-control" name="description" id="description" rows="5" placeholder="This straw is 8 inches long..."></textarea>
                     </div>
                     <div class="m-3">
                         <label for="media" class="form-label">Media</label>
-                        <input class="form-control" type="file" name='files[]' id="media" aria-describedby="mediaHelp" multiple>
+                        <input class="form-control" type="file" name='media[]' id="media" aria-describedby="mediaHelp" multiple>
                         <div id="mediaHelp" class="form-text">Hold Ctrl or Command to select multiple files.</div>
                     </div>
                     <div class="m-3">
                         <label for="sellingprice" class="form-label">Selling Price</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" id="sellingprice" min="0.00" step="0.01" value="0.00">
+                            <input type="number" class="form-control" name="sellingprice" id="sellingprice" min="0.00" step="0.01" value="0.00">
                         </div>
                     </div>
                     <div class="m-3">
                         <label for="originalprice" class="form-label">Original Price</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" id="originalprice" min="0.00" step="0.01" value="0.00">
+                            <input type="number" class="form-control" name="originalprice" id="originalprice" min="0.00" step="0.01" value="0.00">
                         </div>
                     </div>
                     <div class="m-3">
                         <label for="costprice" class="form-label">Cost Price</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" id="costprice" min="0.00" step="0.01" value="0.00">
+                            <input type="number" class="form-control" name="costprice" id="costprice" min="0.00" step="0.01" value="0.00">
                         </div>
                     </div>
                     <div class="m-3">
-                        <label for="quantityleft" class="form-label">Quantity Left</label>
-                        <input type="number" class="form-control" id="quantityleft" value="0">
+                        <label for="quantityavailable" class="form-label">Quantity Available</label>
+                        <input type="number" class="form-control" name="quantityleft" id="quantityavailable" value="0">
                     </div>
                     <div class="m-3">
                         <label for="collections" class="form-label">Collections</label>
-                        <input type="text" class="form-control" id="collections" placeholder="Straws">
+                        <input type="text" class="form-control" name="collections" id="collections" placeholder="Straws">
                     </div>
 <!--                    # For next iteration-->
 <!--                    <div class="form-check m-3">-->
