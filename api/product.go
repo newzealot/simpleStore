@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -23,11 +23,11 @@ type Product struct {
 	Collections       string
 }
 
-func (p *Product) addToDB() {
+func (p *Product) AddToDB() {
 
 }
 
-func addToStorage(user string, files []*multipart.FileHeader) ([]string, error) {
+func AddToStorage(user string, files []*multipart.FileHeader) ([]string, error) {
 	var filenames []string
 	sess, err := session.NewSession()
 	if err != nil {
@@ -41,7 +41,7 @@ func addToStorage(user string, files []*multipart.FileHeader) ([]string, error) 
 			return nil, err
 		}
 		_, err = uploader.Upload(&s3manager.UploadInput{
-			Bucket: aws.String(os.Getenv("S3_BUCKET_NAME")),
+			Bucket: aws.String(os.Getenv("AWS_S3_BUCKET_NAME")),
 			Key:    aws.String(user + "/" + filename),
 			Body:   file,
 		})
@@ -55,14 +55,14 @@ func addToStorage(user string, files []*multipart.FileHeader) ([]string, error) 
 	return filenames, nil
 }
 
-func postProduct(w http.ResponseWriter, r *http.Request) {
+func AddProduct(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(128 << 20); err != nil {
 		log.Println(err)
 		return
 	}
 	formdata := r.MultipartForm
 	files := formdata.File["media[]"] // grab the filenames
-	filenames, err := addToStorage("user", files)
+	filenames, err := AddToStorage("user", files)
 	if err != nil {
 		log.Println(err)
 	}
