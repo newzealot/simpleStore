@@ -1,11 +1,9 @@
 package api
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/gorilla/schema"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -56,21 +54,22 @@ func AddToStorage(user string, files []*multipart.FileHeader) ([]string, error) 
 }
 
 func AddProduct(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseMultipartForm(128 << 20); err != nil {
-		log.Println(err)
-		return
-	}
-	formdata := r.MultipartForm
-	files := formdata.File["media[]"] // grab the filenames
-	filenames, err := AddToStorage("user", files)
-	if err != nil {
-		log.Println(err)
-	}
-	var decoder = schema.NewDecoder()
-	var p Product
-	if err := decoder.Decode(&p, formdata.Value); err != nil {
-		log.Println(err)
-	}
-	p.Media = filenames
-	fmt.Println(p)
+	log.Println("AddProduct")
+	//if err := r.ParseMultipartForm(128 << 20); err != nil {
+	//	log.Println(err)
+	//	return
+	//}
+	//formdata := r.MultipartForm
+	//files := formdata.File["media[]"] // grab the filenames
+	//filenames, err := AddToStorage("user", files)
+	//if err != nil {
+	//	log.Println(err)
+	//}
+	//var decoder = schema.NewDecoder()
+	//var p Product
+	//if err := decoder.Decode(&p, formdata.Value); err != nil {
+	//	log.Println(err)
+	//}
+	//p.Media = filenames
+	//fmt.Println(p)
 }

@@ -18,13 +18,13 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	password2 := r.Form.Get("password2")
 	if password != password2 {
 		log.Println("Unable to register merchant - Passwords do not match")
-		http.Redirect(w, r, "/register.html?error=Passwords do not match", http.StatusFound)
+		http.Redirect(w, r, "/register?error=Passwords do not match", http.StatusFound)
 		return
 	}
 	sess, err := session.NewSession()
 	if err != nil {
 		log.Printf("Unable to start session - %s\n", err)
-		http.Redirect(w, r, "/error.html", http.StatusFound)
+		http.Redirect(w, r, "/error", http.StatusFound)
 		return
 	}
 	user := &cognito.SignUpInput{
@@ -41,7 +41,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	_, err = cognito.New(sess).SignUp(user)
 	if err != nil {
 		log.Printf("Unable to register merchant - %s\n", err)
-		http.Redirect(w, r, "/error.html", http.StatusFound)
+		http.Redirect(w, r, "/error", http.StatusFound)
 	} else {
 		log.Printf("Successfully registered merchant - %s\n", username)
 		http.Redirect(w, r, "/", http.StatusFound)
@@ -56,7 +56,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	sess, err := session.NewSession()
 	if err != nil {
 		log.Printf("Unable to start session - %s\n", err)
-		http.Redirect(w, r, "/error.html", http.StatusFound)
+		http.Redirect(w, r, "/error", http.StatusFound)
 		return
 	}
 	authTry := &cognito.InitiateAuthInput{
@@ -71,13 +71,13 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Unable to login - %s\n", err)
 		if err.Error() == "NotAuthorizedException: Incorrect username or password." {
-			http.Redirect(w, r, "/login.html?error=Incorrect username or password.", http.StatusFound)
+			http.Redirect(w, r, "/login?error=Incorrect username or password.", http.StatusFound)
 			return
 		} else if err.Error() == "UserNotConfirmedException: User is not confirmed." {
-			http.Redirect(w, r, "/login.html?error=User is not confirmed.", http.StatusFound)
+			http.Redirect(w, r, "/login?error=User is not confirmed.", http.StatusFound)
 			return
 		} else {
-			http.Redirect(w, r, "/error.html", http.StatusFound)
+			http.Redirect(w, r, "/error", http.StatusFound)
 			return
 		}
 	}
@@ -114,7 +114,7 @@ func RefreshUser(w http.ResponseWriter, r *http.Request) {
 	rt, err := r.Cookie("RefreshToken")
 	if err != nil {
 		log.Printf("Cookie issue - %s\n", err)
-		http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 	sess, err := session.NewSession()
@@ -131,7 +131,7 @@ func RefreshUser(w http.ResponseWriter, r *http.Request) {
 	res, err := cognito.New(sess).InitiateAuth(authTry)
 	if err != nil {
 		log.Printf("Cookie issue - %s\n", err)
-		http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 	c1 := http.Cookie{
@@ -159,7 +159,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	at, err := r.Cookie("AccessToken")
 	if err != nil {
 		log.Printf("Cookie issue - %s\n", err)
-		http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 	r.ParseForm()
@@ -168,7 +168,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	sess, err := session.NewSession()
 	if err != nil {
 		log.Printf("Unable to start session - %s\n", err)
-		http.Redirect(w, r, "/error.html", http.StatusFound)
+		http.Redirect(w, r, "/error", http.StatusFound)
 		return
 	}
 	changeTry := &cognito.ChangePasswordInput{
@@ -180,18 +180,18 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Unable to change password - %s\n", err)
 		if err.Error() == "NotAuthorizedException: Incorrect username or password." {
-			http.Redirect(w, r, "/change_password.html?error=Incorrect username or password.", http.StatusFound)
+			http.Redirect(w, r, "/change_password?error=Incorrect username or password.", http.StatusFound)
 			return
 		} else if err.Error() == "InvalidParameter: 1 validation error(s) found.\n- minimum field size of 6, ChangePasswordInput.ProposedPassword.\n" {
-			http.Redirect(w, r, "/change_password.html?error=Min 6 characters", http.StatusFound)
+			http.Redirect(w, r, "/change_password?error=Min 6 characters", http.StatusFound)
 			return
 		} else {
-			http.Redirect(w, r, "/error.html", http.StatusFound)
+			http.Redirect(w, r, "/error", http.StatusFound)
 			return
 		}
 	}
 	log.Println("Change password successful")
-	http.Redirect(w, r, "/change_password.html?error=Change password successful", http.StatusSeeOther)
+	http.Redirect(w, r, "/change_password?error=Change password successful", http.StatusSeeOther)
 }
 
 func ForgotPassword(w http.ResponseWriter, r *http.Request) {
@@ -201,7 +201,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	sess, err := session.NewSession()
 	if err != nil {
 		log.Printf("Unable to start session - %s\n", err)
-		http.Redirect(w, r, "/error.html", http.StatusFound)
+		http.Redirect(w, r, "/error", http.StatusFound)
 		return
 	}
 	resetTry := &cognito.ForgotPasswordInput{
@@ -211,11 +211,11 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	_, err = cognito.New(sess).ForgotPassword(resetTry)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(w, r, "/error.html", http.StatusFound)
+		http.Redirect(w, r, "/error", http.StatusFound)
 		return
 	}
 	log.Println("Verification code sent")
-	http.Redirect(w, r, "/verification_code.html?email="+email, http.StatusFound)
+	http.Redirect(w, r, "/verification_code?email="+email, http.StatusFound)
 }
 
 func VerifyEmail(w http.ResponseWriter, r *http.Request) {
@@ -227,7 +227,7 @@ func VerifyEmail(w http.ResponseWriter, r *http.Request) {
 	sess, err := session.NewSession()
 	if err != nil {
 		log.Printf("Unable to start session - %s\n", err)
-		http.Redirect(w, r, "/error.html", http.StatusFound)
+		http.Redirect(w, r, "/error", http.StatusFound)
 		return
 	}
 	codeTry := &cognito.ConfirmForgotPasswordInput{
@@ -240,19 +240,19 @@ func VerifyEmail(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 		if err.Error() == "CodeMismatchException: Invalid verification code provided, please try again." {
-			http.Redirect(w, r, "/verification_code.html?error=Invalid code provided, please request a code again", http.StatusFound)
+			http.Redirect(w, r, "/verification_code?error=Invalid code provided, please request a code again", http.StatusFound)
 			return
 		} else if err.Error() == "ExpiredCodeException: Invalid code provided, please request a code again." {
-			http.Redirect(w, r, "/verification_code.html?error=Invalid code provided, please request a code again", http.StatusFound)
+			http.Redirect(w, r, "/verification_code?error=Invalid code provided, please request a code again", http.StatusFound)
 			return
 		} else if err.Error() == "InvalidParameter: 1 validation error(s) found.\n- minimum field size of 6, ConfirmForgotPasswordInput.Password.\n" {
-			http.Redirect(w, r, "/verification_code.html?error=Min 6 characters", http.StatusFound)
+			http.Redirect(w, r, "/verification_code?error=Min 6 characters", http.StatusFound)
 			return
 		} else {
-			http.Redirect(w, r, "/error.html", http.StatusFound)
+			http.Redirect(w, r, "/error", http.StatusFound)
 			return
 		}
 	}
 	log.Println("Password reset successful")
-	http.Redirect(w, r, "/verification_code.html?error=Password reset successful", http.StatusFound)
+	http.Redirect(w, r, "/verification_code?error=Password reset successful", http.StatusFound)
 }
