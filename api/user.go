@@ -110,51 +110,6 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func RefreshUser(w http.ResponseWriter, r *http.Request) {
-	rt, err := r.Cookie("RefreshToken")
-	if err != nil {
-		log.Printf("Cookie issue - %s\n", err)
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-	sess, err := session.NewSession()
-	if err != nil {
-		log.Println(err)
-	}
-	authTry := &cognito.InitiateAuthInput{
-		AuthFlow: aws.String("REFRESH_TOKEN_AUTH"),
-		AuthParameters: map[string]*string{
-			"REFRESH_TOKEN": aws.String(rt.Value),
-		},
-		ClientId: aws.String(os.Getenv("AWS_COGNITO_APP_CLIENT_ID")),
-	}
-	res, err := cognito.New(sess).InitiateAuth(authTry)
-	if err != nil {
-		log.Printf("Cookie issue - %s\n", err)
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-	c1 := http.Cookie{
-		Name:     "AccessToken",
-		Value:    *res.AuthenticationResult.AccessToken,
-		HttpOnly: true,
-		Path:     "/",
-		Expires:  time.Now().Add(time.Second * time.Duration(*res.AuthenticationResult.ExpiresIn)),
-	}
-	c2 := http.Cookie{
-		Name:     "IdToken",
-		Value:    *res.AuthenticationResult.IdToken,
-		HttpOnly: true,
-		Path:     "/",
-		Expires:  time.Now().Add(time.Second * time.Duration(*res.AuthenticationResult.ExpiresIn)),
-	}
-	http.SetCookie(w, &c1)
-	http.SetCookie(w, &c2)
-	log.Println("Refresh successful")
-	url := r.URL.Query().Get("url")
-	http.Redirect(w, r, url, http.StatusSeeOther)
-}
-
 func ChangePassword(w http.ResponseWriter, r *http.Request) {
 	at, err := r.Cookie("AccessToken")
 	if err != nil {
