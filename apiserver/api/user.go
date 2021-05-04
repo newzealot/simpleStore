@@ -1,13 +1,14 @@
 package api
 
 import (
+	"encoding/json"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	cognito "github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
 	"log"
 	"net/http"
 	"os"
-	"time"
+	"strings"
 )
 
 func AddUser(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +57,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	sess, err := session.NewSession()
 	if err != nil {
 		log.Printf("Unable to start session - %s\n", err)
-		http.Redirect(w, r, "/error", http.StatusFound)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	authTry := &cognito.InitiateAuthInput{
@@ -71,42 +72,25 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Unable to login - %s\n", err)
 		if err.Error() == "NotAuthorizedException: Incorrect username or password." {
-			http.Redirect(w, r, "/login?error=Incorrect username or password.", http.StatusFound)
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		} else if err.Error() == "UserNotConfirmedException: User is not confirmed." {
-			http.Redirect(w, r, "/login?error=User is not confirmed.", http.StatusFound)
+			w.WriteHeader(http.StatusForbidden)
 			return
 		} else {
-			http.Redirect(w, r, "/error", http.StatusFound)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 	}
-	c1 := http.Cookie{
-		Name:     "AccessToken",
-		Value:    *res.AuthenticationResult.AccessToken,
-		HttpOnly: true,
-		Path:     "/",
-		Expires:  time.Now().Add(time.Second * time.Duration(*res.AuthenticationResult.ExpiresIn)),
-	}
-	c2 := http.Cookie{
-		Name:     "IdToken",
-		Value:    *res.AuthenticationResult.IdToken,
-		HttpOnly: true,
-		Path:     "/",
-		Expires:  time.Now().Add(time.Second * time.Duration(*res.AuthenticationResult.ExpiresIn)),
-	}
-	c3 := http.Cookie{
-		Name:     "RefreshToken",
-		Value:    *res.AuthenticationResult.RefreshToken,
-		HttpOnly: true,
-		Path:     "/",
-		Expires:  time.Now().AddDate(0, 0, 30),
-	}
-	http.SetCookie(w, &c1)
-	http.SetCookie(w, &c2)
-	http.SetCookie(w, &c3)
 	log.Printf("Login successful - %s\n", username)
-	http.Redirect(w, r, "/", http.StatusFound)
+	j, err := json.Marshal(*res.AuthenticationResult)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(j)
 	return
 }
 
@@ -210,4 +194,37 @@ func VerifyEmail(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Password reset successful")
 	http.Redirect(w, r, "/verification_code?error=Password reset successful", http.StatusFound)
+}
+
+func RefreshUser(w http.ResponseWriter, r *http.Request) {
+	rt := r.Header.Get("Authorization")
+	rt = strings.Replace(rt, "Bearer ", "", 1)
+	sess, err := session.NewSession()
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	authTry := &cognito.InitiateAuthInput{
+		AuthFlow: aws.String("REFRESH_TOKEN_AUTH"),
+		AuthParameters: map[string]*string{
+			"REFRESH_TOKEN": aws.String(rt),
+		},
+		ClientId: aws.String(os.Getenv("AWS_COGNITO_APP_CLIENT_ID")),
+	}
+	res, err := cognito.New(sess).InitiateAuth(authTry)
+	if err != nil {
+		log.Printf("RefreshToken error - %s\n", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	j, err := json.Marshal(*res.AuthenticationResult)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	log.Println("Refresh successful")
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(j)
 }

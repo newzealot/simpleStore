@@ -11,18 +11,19 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type Product struct {
 	Title             string
+	SellerID          string
 	Description       string
 	Media             []string `schema:"media[]"`
 	SellingPrice      float64
 	OriginalPrice     float64
 	CostPrice         float64
 	QuantityAvailable int
-	Collections       string
-	Seller            string
+	CollectionID      string
 }
 
 func (p *Product) AddToDB() {
@@ -63,12 +64,15 @@ func AddToStorage(username string, productTitle string, files []*multipart.FileH
 }
 
 func AddProduct(w http.ResponseWriter, r *http.Request) {
+	log.Println("AddProduct")
 	// Cookie already verified by middleware, so skipping error checks
-	at, _ := r.Cookie("AccessToken")
-	pat, _ := jwt.Parse([]byte(at.Value))
+	at := r.Header.Get("Authorization")
+	at = strings.Replace(at, "Bearer ", "", 1)
+	pat, _ := jwt.Parse([]byte(at))
 	merchant, _ := pat.Get("username")
 	// normal err checks resume from here on
 	if err := r.ParseMultipartForm(128 << 20); err != nil {
+		log.Println("here")
 		log.Println(err)
 		return
 	}
@@ -78,9 +82,9 @@ func AddProduct(w http.ResponseWriter, r *http.Request) {
 	if err := decoder.Decode(&p, formdata.Value); err != nil {
 		log.Println(err)
 	}
-	p.Seller = fmt.Sprint(merchant)
+	p.SellerID = fmt.Sprint(merchant)
 	files := formdata.File["media[]"] // grab the filenames
-	filenames, err := AddToStorage(p.Seller, p.Title, files)
+	filenames, err := AddToStorage(p.SellerID, p.Title, files)
 	if err != nil {
 		log.Println(err)
 	}

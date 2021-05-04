@@ -1,0 +1,25 @@
+{{ define "content" }}
+  <h1>Login</h1>
+  {{if .status }}
+    <div class="alert alert-danger text-center" role="alert">
+      {{ .status }}
+    </div>
+  {{ end }}
+  <section class="container">
+    <form method="post" action="/login">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input class="form-control form-control-sm" type="email" name="email" id="email" placeholder="user@example.com">
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input class="form-control form-control-sm" type="password" name="password" id="password">
+      </div>
+      <div id="loginHelp" class="mb-3 form-text d-none">Incorrect username/password</div>
+      {{ .csrfField }}
+      <button type="submit" class="btn btn-primary">Login</button>
+      <a href="/forgot_password">Forgot Password</a>
+      <a href="/change_password">Change Password</a>
+    </form>
+  </section>
+{{ end }}
