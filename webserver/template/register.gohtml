@@ -1,0 +1,23 @@
+{{ define "content" }}
+  <h1>Register</h1>
+  <section class="container">
+    <form method="post" action="/register">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input class="form-control form-control-sm" type="email" name="email" id="email" placeholder="user@example.com">
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input class="form-control form-control-sm" type="password" name="password" id="password" aria-describedby="passwordHelp">
+        <div id="passwordHelp" class="form-text">Min 6 characters</div>
+      </div>
+      <div class="mb-3">
+        <label for="password2" class="form-label">Confirm Password</label>
+        <input class="form-control form-control-sm" type="password" name="password2" id="password2">
+      </div>
+      <div id="password2Help" class="mb-3 form-text d-none"></div>
+      {{ .csrfField }}
+      <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+  </section>
+{{ end }}

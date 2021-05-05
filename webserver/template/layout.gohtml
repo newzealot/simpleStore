@@ -9,6 +9,11 @@
 <body>
     <nav>Nav</nav>
     <main class="container">
+        {{if .status }}
+            <div class="alert alert-danger text-center" role="alert">
+                {{ .status }}
+            </div>
+        {{ end }}
         {{ template "content" . }}
     </main>
     <footer>Footer</footer>

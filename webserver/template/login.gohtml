@@ -1,10 +1,5 @@
 {{ define "content" }}
   <h1>Login</h1>
-  {{if .status }}
-    <div class="alert alert-danger text-center" role="alert">
-      {{ .status }}
-    </div>
-  {{ end }}
   <section class="container">
     <form method="post" action="/login">
       <div class="mb-3">

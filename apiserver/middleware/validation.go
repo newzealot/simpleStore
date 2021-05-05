@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func ValidationMiddleWare(next http.Handler) http.Handler {
+func Validation(next http.Handler) http.Handler {
 	log.Println("ValidationMiddleWare")
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		at := r.Header.Get("Authorization")

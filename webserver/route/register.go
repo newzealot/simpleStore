@@ -12,17 +12,17 @@ import (
 	"time"
 )
 
-func LoginGET(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("template/layout.gohtml", "template/login.gohtml")
+func RegisterGET(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("template/layout.gohtml", "template/register.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
 		"status":         r.URL.Query().Get("status"),
 	})
 }
 
-func LoginPOST(w http.ResponseWriter, r *http.Request) {
+func RegisterPOST(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", os.Getenv("SERVER")+"/api/v1/login", strings.NewReader(r.PostForm.Encode()))
+	req, err := http.NewRequest("POST", os.Getenv("SERVER")+"/api/v1/register", strings.NewReader(r.PostForm.Encode()))
 	if err != nil {
 		log.Println(err)
 		http.Redirect(w, r, r.URL.Path+"?status=Something went wrong", http.StatusSeeOther)
@@ -38,11 +38,11 @@ func LoginPOST(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		switch resp.StatusCode {
-		case http.StatusUnauthorized:
-			http.Redirect(w, r, r.URL.Path+"?status=Incorrect username or password", http.StatusSeeOther)
+		case http.StatusBadRequest:
+			http.Redirect(w, r, r.URL.Path+"?status=Invalid password. Check if both passwords are the same.", http.StatusSeeOther)
 			return
-		case http.StatusForbidden:
-			http.Redirect(w, r, r.URL.Path+"?status=Email not confirmed", http.StatusSeeOther)
+		case http.StatusConflict:
+			http.Redirect(w, r, r.URL.Path+"?status=Email already exists", http.StatusSeeOther)
 			return
 		default:
 			http.Redirect(w, r, r.URL.Path+"?status=Something went wrong", http.StatusSeeOther)
@@ -90,6 +90,6 @@ func LoginPOST(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &c1)
 	http.SetCookie(w, &c2)
 	http.SetCookie(w, &c3)
-	log.Println("Cookies set")
+	log.Println("Registration successful")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
