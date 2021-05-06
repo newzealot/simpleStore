@@ -16,43 +16,44 @@ func LoginGET(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/login.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
-		"status":         r.URL.Query().Get("status"),
+		"error":          r.URL.Query().Get("error"),
+		"info":           r.URL.Query().Get("info"),
 	})
 }
 
 func LoginPOST(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", os.Getenv("SERVER")+"/api/v1/login", strings.NewReader(r.PostForm.Encode()))
+	req, err := http.NewRequest("POST", os.Getenv("APISERVER")+"/api/v1/login", strings.NewReader(r.PostForm.Encode()))
 	if err != nil {
 		log.Println(err)
-		http.Redirect(w, r, r.URL.Path+"?status=Something went wrong", http.StatusSeeOther)
+		http.Redirect(w, r, r.URL.Path+"?error=Something went wrong", http.StatusSeeOther)
 		return
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(w, r, r.URL.Path+"?status=Unable to connect to other server", http.StatusSeeOther)
+		http.Redirect(w, r, r.URL.Path+"?error=Unable to connect to other server", http.StatusSeeOther)
 		return
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		switch resp.StatusCode {
 		case http.StatusUnauthorized:
-			http.Redirect(w, r, r.URL.Path+"?status=Incorrect username or password", http.StatusSeeOther)
+			http.Redirect(w, r, r.URL.Path+"?error=Incorrect username or password", http.StatusSeeOther)
 			return
 		case http.StatusForbidden:
-			http.Redirect(w, r, r.URL.Path+"?status=Email not confirmed", http.StatusSeeOther)
+			http.Redirect(w, r, r.URL.Path+"?error=Email not confirmed", http.StatusSeeOther)
 			return
 		default:
-			http.Redirect(w, r, r.URL.Path+"?status=Something went wrong", http.StatusSeeOther)
+			http.Redirect(w, r, r.URL.Path+"?error=Something went wrong", http.StatusSeeOther)
 			return
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(w, r, r.URL.Path+"?status=Something went wrong", http.StatusSeeOther)
+		http.Redirect(w, r, r.URL.Path+"?error=Something went wrong", http.StatusSeeOther)
 		return
 	}
 	var j struct {
@@ -63,7 +64,7 @@ func LoginPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	if err = json.Unmarshal(body, &j); err != nil {
 		log.Println(err)
-		http.Redirect(w, r, r.URL.Path+"?status=Something went wrong", http.StatusSeeOther)
+		http.Redirect(w, r, r.URL.Path+"?error=Something went wrong", http.StatusSeeOther)
 		return
 	}
 	c1 := http.Cookie{

@@ -9,9 +9,19 @@
 <body>
     <nav>Nav</nav>
     <main class="container">
-        {{if .status }}
+        {{if .error }}
             <div class="alert alert-danger text-center" role="alert">
-                {{ .status }}
+                {{ .error }}
+            </div>
+        {{ end }}
+        {{if .success }}
+            <div class="alert alert-success text-center" role="alert">
+                {{ .success }}
+            </div>
+        {{ end }}
+        {{if .info }}
+            <div class="alert alert-primary text-center" role="alert">
+                {{ .info }}
             </div>
         {{ end }}
         {{ template "content" . }}

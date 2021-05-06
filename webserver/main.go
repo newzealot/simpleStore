@@ -14,8 +14,8 @@ func main() {
 	protected := r.Host("localhost:5000").Subrouter()
 	protected.HandleFunc("/add_product", AddProductGET).Methods("GET")
 	protected.HandleFunc("/add_product", AddProductPOST).Methods("POST")
-	protected.Use(Validation)
-
+	protected.Use(AccessTokenCheck)
+	r.HandleFunc("/add_product", AddProductPOST).Methods("POST")
 	r.HandleFunc("/login", LoginGET).Methods("GET")
 	r.HandleFunc("/login", LoginPOST).Methods("POST")
 	r.HandleFunc("/register", RegisterGET).Methods("GET")
