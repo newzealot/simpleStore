@@ -18,9 +18,11 @@ func main() {
 	r.HandleFunc("/add_product", AddProductPOST).Methods("POST")
 	r.HandleFunc("/login", LoginGET).Methods("GET")
 	r.HandleFunc("/login", LoginPOST).Methods("POST")
+	r.HandleFunc("/logout", LogoutGET).Methods("GET")
 	r.HandleFunc("/register", RegisterGET).Methods("GET")
 	r.HandleFunc("/register", RegisterPOST).Methods("POST")
 	r.HandleFunc("/", IndexGET).Methods("GET")
+
 	if err := http.ListenAndServe(":5000", csrf.Protect([]byte("32-byte-long-auth-key"))(r)); err != nil {
 		log.Fatalln(err)
 	}
