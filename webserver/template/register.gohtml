@@ -1,5 +1,10 @@
 {{ define "content" }}
 <div class="main bg-light vh-100">
+  {{if .error }}
+    <div class="alert alert-danger text-center" role="alert">
+      {{ .error }}
+    </div>
+  {{ end }}
   <h1>Register</h1>
   <section class="container">
     <form method="post" action="/register">

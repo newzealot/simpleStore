@@ -1,5 +1,20 @@
 {{ define "content" }}
 <div class="main bg-light vh-100">
+  {{if .success }}
+    <div class="alert alert-success text-center" role="alert">
+      {{ .success }}
+    </div>
+  {{ end }}
+  {{if .error }}
+    <div class="alert alert-danger text-center" role="alert">
+      {{ .error }}
+    </div>
+  {{ end }}
+  {{if .info }}
+    <div class="alert alert-primary text-center" role="alert">
+      {{ .info }}
+    </div>
+  {{ end }}
   <h1>Login</h1>
   <section class="container">
     <form method="post" action="/login">
