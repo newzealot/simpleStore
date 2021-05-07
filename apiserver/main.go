@@ -15,10 +15,10 @@ func main() {
 
 	r := mux.NewRouter()
 	protected := r.Host("localhost:8080").Subrouter()
-	r.HandleFunc("/api/v1/product", ProductHandler).Methods("POST")
-	protected.HandleFunc("/api/v1/media", MediaHandler).Methods("POST")
+	protected.HandleFunc("/api/v1/product", ProductHandler).Methods("POST")
 	protected.Use(Validation)
-	r.HandleFunc("/api/v1/media", MediaHandler).Methods("POST")
+	r.HandleFunc("/api/v1/data", DataHandler).Methods("GET")
+	r.HandleFunc("/api/v1/collection", CollectionHandler).Methods("GET")
 	r.HandleFunc("/api/v1/refresh", RefreshHandler).Methods("POST")
 	r.HandleFunc("/api/v1/register", RegisterHandler).Methods("POST")
 	r.HandleFunc("/api/v1/login", LoginHandler).Methods("POST")

@@ -33,6 +33,7 @@ func Validation(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
+		// confirming username is present and not empty
 		username, ok := p.Get("username")
 		if ok == false || username == "" {
 			log.Println(err)

@@ -12,7 +12,7 @@ var DB *sql.DB
 
 func SetupDB() func() {
 	var err error
-	var dsn = fmt.Sprintf("%s:%s@tcp(%s:3306)/%s",
+	var dsn = fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?parseTime=true",
 		os.Getenv("AWS_MYSQL_USERNAME"),
 		os.Getenv("AWS_MYSQL_PASSWORD"),
 		os.Getenv("AWS_MYSQL_ENDPOINT"),

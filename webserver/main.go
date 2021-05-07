@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	GetCollection()
 	GetData()
 	r := mux.NewRouter()
 	protected := r.Host("localhost:5000").Subrouter()
