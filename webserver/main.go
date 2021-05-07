@@ -5,11 +5,13 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	. "simpleStore/webserver/data"
 	. "simpleStore/webserver/middleware"
 	. "simpleStore/webserver/route"
 )
 
 func main() {
+	GetData()
 	r := mux.NewRouter()
 	protected := r.Host("localhost:5000").Subrouter()
 	protected.HandleFunc("/admin", AdminGET).Methods("GET")
