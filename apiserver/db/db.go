@@ -19,13 +19,9 @@ func SetupDB() func() {
 		os.Getenv("AWS_MYSQL_DBNAME"),
 	)
 	DB, err = sql.Open("mysql", dsn)
-	log.Println(dsn)
 	if err != nil {
 		log.Fatalln(err)
-	} else {
-		log.Println("db opened")
 	}
-
 	return func() {
 		err = DB.Close()
 		if err != nil {

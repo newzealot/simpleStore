@@ -1,15 +1,38 @@
 {{ define "content" }}
-
-  <div class="sidenav navbar-light bg-light d-none d-lg-block">
+    <div class="sidenav navbar-light bg-light d-none d-lg-block">
     <ul class="navbar-nav ms-auto ps-4">
-      {{range $collection := .Collections}}
+      {{range $c := .Collections}}
         <li class="nav-item">
-          <a class="nav-link active" href="/collection/{{$collection}}">{{$collection}}</a>
+          <a class="nav-link active" href="/collection/{{$c}}">{{$c}}</a>
         </li>
       {{end}}
     </ul>
-  </div>
-  <div class="main bg-light vh-100">
-    <h1>All Collections</h1>
-  </div>
+    </div>
+    <div class="main bg-light vh-100">
+    <h2 class="my-4">All Collections</h2>
+      {{range $i, $p := .ProductStore}}
+          <div class="card" style="width: 18rem;">
+                {{if ne $p.SellingPrice $p.DiscountedPrice}}
+                    <div class="sale">Sale</div>
+                {{end}}
+              <img src="{{$p.FileName}}" class="card-img-top" alt="{{$p.Title}}" style="object-fit:contain">
+              <div class="card-body">
+                  <p class="card-text text-center">{{$p.Title}}
+                      <br />
+                  {{if eq $p.SellingPrice $p.DiscountedPrice}}
+                      ${{$p.SellingPrice}}
+                  </p>
+                  {{ else }}
+                      <span class="text-danger">
+                          ${{$p.DiscountedPrice}}
+                      </span>
+                      <s>
+                          ${{$p.SellingPrice}}
+                      </s>
+                  </p>
+                  {{ end }}
+              </div>
+          </div>
+      {{end}}
+    </div>
 {{ end }}

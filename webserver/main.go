@@ -11,8 +11,7 @@ import (
 )
 
 func main() {
-	GetCollection()
-	GetData()
+	D.GetData()
 	r := mux.NewRouter()
 	protected := r.Host("localhost:5000").Subrouter()
 	protected.HandleFunc("/admin", AdminGET).Methods("GET")
@@ -25,6 +24,7 @@ func main() {
 	r.HandleFunc("/logout", LogoutGET).Methods("GET")
 	r.HandleFunc("/register", RegisterGET).Methods("GET")
 	r.HandleFunc("/register", RegisterPOST).Methods("POST")
+	r.HandleFunc("/collection/{id}", CollectionGET).Methods("GET")
 	r.HandleFunc("/", IndexGET).Methods("GET")
 
 	if err := http.ListenAndServe(":5000", csrf.Protect([]byte("32-byte-long-auth-key"))(r)); err != nil {

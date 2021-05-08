@@ -2,10 +2,13 @@ package data
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -25,14 +28,7 @@ type Data struct {
 	Created           time.Time
 }
 
-type Card struct {
-	PictureURL      string
-	SellingPrice    float64
-	DiscountedPrice float64
-}
-
-var d DataStore
-var Collections []string
+var D DataStore
 
 func partition(arr []string, leftIndex int, rightIndex int) int {
 	pivotValue := arr[(leftIndex+rightIndex)/2]
@@ -59,34 +55,38 @@ func QuickSort(arr []string, leftIndex int, rightIndex int) []string {
 	return arr
 }
 
-func GetCollection() {
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", os.Getenv("APISERVER")+"/api/v1/collection", nil)
-	if err != nil {
-		log.Println(err)
-		return
+func (D *DataStore) GetCollection(s string) []Data {
+	// Allow only 1 unique row (results in only one filename)
+	collection := []Data{}
+	temp := map[string]Data{}
+	for _, v := range *D {
+		v.FileName = fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), v.ProductID, v.FileName)
+		temp[v.ProductID] = v
 	}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err)
-		return
+	for _, v := range temp {
+		if s == "All" || v.CollectionID == s {
+			collection = append(collection, v)
+		}
 	}
-	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	if err := json.Unmarshal(b, &Collections); err != nil {
-		log.Println(err)
-		return
-	}
-	Collections = QuickSort(Collections, 0, len(Collections)-1)
-	Collections = append([]string{"All"}, Collections...)
-	log.Println("Collections Retrieved", Collections)
+	return collection
 }
 
-func GetData() {
+func (D *DataStore) GetMenu() []string {
+	collections := []string{}
+	temp := map[string]bool{}
+	for _, v := range *D {
+		temp[v.CollectionID] = true
+	}
+	for k, _ := range temp {
+		t := strings.Title(k)
+		collections = append(collections, t)
+	}
+	collections = QuickSort(collections, 0, len(collections)-1)
+	collections = append([]string{"All"}, collections...)
+	return collections
+}
+
+func (D *DataStore) GetData() {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", os.Getenv("APISERVER")+"/api/v1/data", nil)
 	if err != nil {
@@ -104,9 +104,12 @@ func GetData() {
 		log.Println(err)
 		return
 	}
-	if err := json.Unmarshal(b, &d); err != nil {
+	if err := json.Unmarshal(b, D); err != nil {
 		log.Println(err)
 		return
 	}
-	log.Println("DataStore Retrieved", d)
+	// sort by newest item first
+	sort.Slice(*D, func(i, j int) bool {
+		return (*D)[i].Created.After((*D)[j].Created)
+	})
 }
