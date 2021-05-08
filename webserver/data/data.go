@@ -28,6 +28,20 @@ type Data struct {
 	Created           time.Time
 }
 
+type Product struct {
+	ProductID         string
+	Title             string
+	Description       string
+	FileName          []string
+	SellingPrice      float64
+	DiscountedPrice   float64
+	CostPrice         float64
+	QuantityAvailable int
+	CollectionID      string
+	MerchantID        string
+	Created           time.Time
+}
+
 var D DataStore
 
 func partition(arr []string, leftIndex int, rightIndex int) int {
@@ -53,6 +67,27 @@ func QuickSort(arr []string, leftIndex int, rightIndex int) []string {
 		QuickSort(arr, pivotIndex+1, rightIndex)
 	}
 	return arr
+}
+
+func (D *DataStore) GetProduct(s string) Product {
+	// Only difference is FileName is []string
+	p := Product{}
+	for _, v := range *D {
+		if v.ProductID == s {
+			p.ProductID = v.ProductID
+			p.Title = v.Title
+			p.Description = v.Description
+			p.FileName = append(p.FileName, fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), v.ProductID, v.FileName))
+			p.SellingPrice = v.SellingPrice
+			p.DiscountedPrice = v.DiscountedPrice
+			p.CostPrice = v.CostPrice
+			p.QuantityAvailable = v.QuantityAvailable
+			p.CollectionID = v.CollectionID
+			p.MerchantID = v.MerchantID
+			p.Created = v.Created
+		}
+	}
+	return p
 }
 
 func (D *DataStore) GetAdmin(s string) []Data {

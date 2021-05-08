@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
 	"html/template"
 	"io"
 	"log"
@@ -14,23 +15,19 @@ import (
 	"strings"
 )
 
-func AddProductGET(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("template/layout.gohtml", "template/add_product.gohtml")
+func EditProductGET(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	t, _ := template.ParseFiles("template/layout.gohtml", "template/edit_product.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
 		"error":          r.URL.Query().Get("error"),
 		"success":        r.URL.Query().Get("success"),
+		"Product":        D.GetProduct(vars["id"]),
 	})
 }
 
-func AddProductPOST(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		if err := recover(); err != nil {
-			log.Println(err)
-			http.Redirect(w, r, r.URL.Path+"?error=Something went wrong", http.StatusSeeOther)
-			return
-		}
-	}()
+func EditProductPOST(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
 	at := r.Header.Get("Authorization")
 	at = strings.Replace(at, "Bearer ", "", 1)
 	// Continue to process form
@@ -60,7 +57,7 @@ func AddProductPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", os.Getenv("APISERVER")+"/api/v1/product", bytes.NewBuffer(bodyBuf.Bytes()))
+	req, err := http.NewRequest("PUT", os.Getenv("APISERVER")+"/api/v1/product/"+vars["id"], bytes.NewBuffer(bodyBuf.Bytes()))
 	if err != nil {
 		log.Println(err)
 		http.Redirect(w, r, r.URL.Path+"?error=Something went wrong", http.StatusSeeOther)
@@ -87,6 +84,6 @@ func AddProductPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("Successfully added product")
 	D.GetData()
-	http.Redirect(w, r, r.URL.Path+"?success=Successfully added product", http.StatusSeeOther)
+	http.Redirect(w, r, r.URL.Path+"?success=Successfully edited product", http.StatusSeeOther)
 	return
 }
