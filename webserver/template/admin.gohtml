@@ -16,6 +16,25 @@
         </ul>
     </div>
     <div class="main bg-light vh-100">
-        <h1>Index Page</h1>
+        <h2 class="my-4">Admin Page</h2>
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <td>Name</td>
+                    <td>Edit</td>
+                    <td>Delete</td>
+                </tr>
+            </thead>
+            <tbody>
+            {{ range $i, $v := .AdminList }}
+                <tr>
+                    <td>{{ $v.Title }}</td>
+                    <td><a href="/admin/edit/{{ $v.ProductID }}">Edit</a></td>
+                    <td><a href="/admin/delete/{{ $v.ProductID }}">Delete</a></td>
+                </tr>
+            {{ end }}
+            </tbody>
+        </table>
+
     </div>
 {{ end }}

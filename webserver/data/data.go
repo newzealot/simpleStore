@@ -55,6 +55,22 @@ func QuickSort(arr []string, leftIndex int, rightIndex int) []string {
 	return arr
 }
 
+func (D *DataStore) GetAdmin(s string) []Data {
+	// Allow only 1 unique row (results in only one filename)
+	admin := []Data{}
+	temp := map[string]Data{}
+	for _, v := range *D {
+		v.FileName = fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), v.ProductID, v.FileName)
+		temp[v.ProductID] = v
+	}
+	for _, v := range temp {
+		if v.MerchantID == s {
+			admin = append(admin, v)
+		}
+	}
+	return admin
+}
+
 func (D *DataStore) GetCollection(s string) []Data {
 	// Allow only 1 unique row (results in only one filename)
 	collection := []Data{}
