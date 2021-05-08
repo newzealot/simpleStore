@@ -27,6 +27,7 @@ func VerifyAccessToken(at string) (string, error) {
 		jwt.WithClaimValue("token_use", "access"),
 	)
 	if err != nil {
+		log.Println("here")
 		return "", err
 	}
 	m, ok := p.Get("username")

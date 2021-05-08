@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -19,7 +20,7 @@ type ProductMedia struct {
 	Filename  string
 }
 
-func AddToDB(productid string, merchantid string, values map[string][]string) error {
+func QueryDB(productid string, merchantid string, q string, values map[string][]string) error {
 	singleMap := map[string]string{}
 	for k, v := range values {
 		if len(v) != 1 {
@@ -67,17 +68,13 @@ func AddToDB(productid string, merchantid string, values map[string][]string) er
 		fmt.Sprint(merchantid),
 	}
 	// call stored procedure
-	q := "CALL ADD_PRODUCT(?,?,?,?,?,?,?,?,?)"
-	res, err := DB.Exec(
+	_, err = DB.Exec(
 		q, p.ProductID, p.Title, p.Description,
 		p.SellingPrice, p.DiscountedPrice, p.CostPrice, p.ProductCollection,
 		p.QuantityAvailable, p.MerchantID,
 	)
 	if err != nil {
 		return err
-	}
-	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected == 0 {
-		return fmt.Errorf("PRODUCT table 0 rows affected or %s\n", err)
 	}
 	log.Printf("%s inserted into DB successfully\n", productid)
 	return nil
@@ -131,10 +128,8 @@ func AddToStorage(productid string, files []*multipart.FileHeader) error {
 }
 
 func ProductHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	// Cookie already verified by middleware, so skipping error checks
 	merchantID := r.Header.Get("merchantID")
-	// normal err checks resume from here on
-	productid := uuid.NewString()
+	productID := uuid.NewString()
 	if err := r.ParseMultipartForm(128 << 20); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -142,43 +137,47 @@ func ProductHandlerPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	formdata := r.MultipartForm
-	if err := AddToDB(productid, fmt.Sprint(merchantID), formdata.Value); err != nil {
+	q := "CALL ADD_PRODUCT(?,?,?,?,?,?,?,?,?)"
+	if err := QueryDB(productID, fmt.Sprint(merchantID), q, formdata.Value); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
 	}
-	if err := AddToStorage(productid, formdata.File["media"]); err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInsufficientStorage)
-		w.Write([]byte(err.Error()))
-		return
+	if len(formdata.File["media"]) != 0 {
+		if err := AddToStorage(productID, formdata.File["media"]); err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInsufficientStorage)
+			w.Write([]byte(err.Error()))
+			return
+		}
 	}
 }
 
 func ProductHandlerPUT(w http.ResponseWriter, r *http.Request) {
-	log.Println("PUT")
-	//// Cookie already verified by middleware, so skipping error checks
-	//merchantID := r.Header.Get("merchantID")
-	//// normal err checks resume from here on
-	//productid := uuid.NewString()
-	//if err := r.ParseMultipartForm(128 << 20); err != nil {
-	//	log.Println(err)
-	//	w.WriteHeader(http.StatusInternalServerError)
-	//	w.Write([]byte("Cannot parse multipart form"))
-	//	return
-	//}
-	//formdata := r.MultipartForm
-	//if err := AddToDB(productid, fmt.Sprint(merchantID), formdata.Value); err != nil {
-	//	log.Println(err)
-	//	w.WriteHeader(http.StatusInternalServerError)
-	//	w.Write([]byte(err.Error()))
-	//	return
-	//}
-	//if err := AddToStorage(productid, formdata.File["media"]); err != nil {
-	//	log.Println(err)
-	//	w.WriteHeader(http.StatusInsufficientStorage)
-	//	w.Write([]byte(err.Error()))
-	//	return
-	//}
+	vars := mux.Vars(r)
+	merchantID := r.Header.Get("merchantID")
+	productID := vars["id"]
+	if err := r.ParseMultipartForm(128 << 20); err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Cannot parse multipart form"))
+		return
+	}
+	formdata := r.MultipartForm
+	q := "CALL EDIT_PRODUCT(?,?,?,?,?,?,?,?,?)"
+	if err := QueryDB(productID, fmt.Sprint(merchantID), q, formdata.Value); err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	if len(formdata.File["media"]) != 0 {
+		if err := AddToStorage(productID, formdata.File["media"]); err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInsufficientStorage)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	}
 }

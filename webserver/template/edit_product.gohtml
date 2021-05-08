@@ -25,7 +25,7 @@
             {{ $top := .Product }}
             {{ range $i, $v := .Product.FileName }}
             <div>
-                <img class="p-3" src="{{ $v }}" style="object-fit:contain;width:9rem;"><a href="/admin/delete_media/{{ $top.ProductID }}">Delete</a>
+                <img class="p-3" src="{{ $top.FileNamePrefix }}{{ $v }}" style="object-fit:contain;width:9rem;"><a href="/admin/delete_media/{{ $top.ProductID }}/{{ $v }}">Delete</a>
             </div>
             {{ end }}
             <div class="mb-3">

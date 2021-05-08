@@ -33,6 +33,7 @@ type Product struct {
 	Title             string
 	Description       string
 	FileName          []string
+	FileNamePrefix    string
 	SellingPrice      float64
 	DiscountedPrice   float64
 	CostPrice         float64
@@ -77,7 +78,8 @@ func (D *DataStore) GetProduct(s string) Product {
 			p.ProductID = v.ProductID
 			p.Title = v.Title
 			p.Description = v.Description
-			p.FileName = append(p.FileName, fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), v.ProductID, v.FileName))
+			p.FileName = append(p.FileName, v.FileName)
+			p.FileNamePrefix = fmt.Sprintf("%s%s/", os.Getenv("AWS_S3_URL_PREFIX"), v.ProductID)
 			p.SellingPrice = v.SellingPrice
 			p.DiscountedPrice = v.DiscountedPrice
 			p.CostPrice = v.CostPrice
