@@ -20,6 +20,7 @@ func main() {
 	protected.HandleFunc("/admin/edit_product/{id}", EditProductGET).Methods("GET")
 	protected.HandleFunc("/admin/edit_product/{id}", EditProductPOST).Methods("POST")
 	protected.HandleFunc("/admin/delete_product/{id}", DeleteProductGET).Methods("GET")
+	protected.HandleFunc("/admin/delete_product/{id}", DeleteProductPOST).Methods("POST")
 	protected.HandleFunc("/admin/delete_media/{id}/{filename}", DeleteMediaGET).Methods("GET")
 	//protected.HandleFunc("/admin/delete_product/{id}", DeleteProductGET).Methods("GET")
 	//protected.HandleFunc("/admin/delete_product/{id}", DeleteProductPOST).Methods("POST")

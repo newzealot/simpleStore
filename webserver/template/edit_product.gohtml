@@ -25,14 +25,14 @@
             <label for="sellingprice" class="form-label">Selling Price</label>
             <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control form-control-sm" name="sellingprice" id="sellingprice" min="0.00" step="0.01" value="{{ .Product.SellingPrice }}">
+                <input type="number" class="form-control form-control-sm" name="sellingprice" id="sellingprice" min="0.00" step="0.01" value="{{ printf "%.2f" .Product.SellingPrice }}">
             </div>
         </div>
         <div class="mb-3">
             <label for="discountedprice" class="form-label">Discounted Price</label>
             <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control form-control-sm" name="discountedprice" id="discountedprice" min="0.00" step="0.01" aria-describedby="discountedHelp" value="{{ .Product.DiscountedPrice }}">
+                <input type="number" class="form-control form-control-sm" name="discountedprice" id="discountedprice" min="0.00" step="0.01" aria-describedby="discountedHelp" value="{{ printf "%.2f" .Product.DiscountedPrice }}">
             </div>
             <div id="discountedHelp" class="form-text">If no discount, set to same price as selling price</div>
         </div>
@@ -40,7 +40,7 @@
             <label for="costprice" class="form-label">Cost Price</label>
             <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control form-control-sm" name="costprice" id="costprice" min="0.00" step="0.01" value="{{ .Product.CostPrice }}">
+                <input type="number" class="form-control form-control-sm" name="costprice" id="costprice" min="0.00" step="0.01" value="{{ printf "%.2f" .Product.CostPrice }}">
             </div>
         </div>
         <div class="mb-3">
