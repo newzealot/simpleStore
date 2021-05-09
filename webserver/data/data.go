@@ -94,6 +94,11 @@ func (D *DataStore) GetProduct(s string) Product {
 			p.Created = v.Created
 		}
 	}
+	t := []string{}
+	for i := len(p.FileName) - 1; i >= 0; i-- {
+		t = append(t, p.FileName[i])
+	}
+	p.FileName = t
 	return p
 }
 

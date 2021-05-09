@@ -1,7 +1,6 @@
 package route
 
 import (
-	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
@@ -16,9 +15,8 @@ func CollectionGET(w http.ResponseWriter, r *http.Request) {
 	}
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/collection.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
-		csrf.TemplateTag: csrf.TemplateField(r),
-		"Collections":    D.GetMenu(),
-		"ProductStore":   D.GetCollection(vars["id"]),
-		"CollectionID":   vars["id"],
+		"Collections":  D.GetMenu(),
+		"ProductStore": D.GetCollection(vars["id"]),
+		"CollectionID": vars["id"],
 	})
 }

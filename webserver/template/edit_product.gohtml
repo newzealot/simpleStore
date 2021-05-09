@@ -10,6 +10,7 @@
             <label for="description" class="form-label">Description</label>
             <textarea class="form-control form-control-sm" name="description" id="description" rows="5" placeholder="{{ .Product.Description }}">{{ .Product.Description }}</textarea>
         </div>
+        <div class="text-danger">Product needs at least one picture. Please do not delete until there are no pictures left.</div>
         {{ $top := .Product }}
         {{ range $i, $v := .Product.FileName }}
         <div>

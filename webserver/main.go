@@ -22,15 +22,16 @@ func main() {
 	protected.HandleFunc("/admin/delete_product/{id}", DeleteProductGET).Methods("GET")
 	protected.HandleFunc("/admin/delete_product/{id}", DeleteProductPOST).Methods("POST")
 	protected.HandleFunc("/admin/delete_media/{id}/{filename}", DeleteMediaGET).Methods("GET")
-	//protected.HandleFunc("/admin/delete_product/{id}", DeleteProductGET).Methods("GET")
-	//protected.HandleFunc("/admin/delete_product/{id}", DeleteProductPOST).Methods("POST")
 	protected.Use(AccessTokenCheck)
+	r.HandleFunc("/contact", ContactGET).Methods("GET")
 	r.HandleFunc("/login", LoginGET).Methods("GET")
 	r.HandleFunc("/login", LoginPOST).Methods("POST")
 	r.HandleFunc("/logout", LogoutGET).Methods("GET")
 	r.HandleFunc("/register", RegisterGET).Methods("GET")
 	r.HandleFunc("/register", RegisterPOST).Methods("POST")
+	r.HandleFunc("/product/{id}", ProductGET).Methods("GET")
 	r.HandleFunc("/collection/{id}", CollectionGET).Methods("GET")
+	r.HandleFunc("/order/{id}", OrderPOST).Methods("POST")
 	r.HandleFunc("/", IndexGET).Methods("GET")
 
 	if err := http.ListenAndServe(":5000", csrf.Protect([]byte("32-byte-long-auth-key"))(r)); err != nil {

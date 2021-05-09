@@ -1,0 +1,82 @@
+{{ define "content" }}
+    <div class="sidenav navbar-light bg-light d-none d-lg-block">
+        <ul class="navbar-nav ms-auto ps-4">
+            {{range $c := .Collections}}
+                <li class="nav-item">
+                    <a class="nav-link active" href="/collection/{{$c}}">{{$c}}</a>
+                </li>
+            {{end}}
+        </ul>
+    </div>
+    <div class="index-main">
+        <div class="row my-4">
+            <div class="col">
+                <div id="carouselExampleControls" class="carousel slide carousel-dark d-flex justify-content-left" data-bs-ride="carousel" style="object-fit:contain;min-height:300px;min-width:300px;max-height:440px;max-width:440px">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img class="d-block w-100" src="{{ .Product.FileNamePrefix }}{{ index .Product.FileName 0 }}" style="object-fit:contain"/>
+                        </div>
+                        {{ $top := .Product }}
+                        {{ range $i, $v := .Product.FileName}}
+                            {{ if ne $i 0 }}
+                            <div class="carousel-item">
+                                <img class="d-block w-100" src="{{ $top.FileNamePrefix }}{{ $v }}" style="object-fit:contain" />
+                            </div>
+                            {{ end }}
+                        {{ end }}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <div class="d-flex justify-content-left">
+                {{ range $i, $v := .Product.FileName}}
+                    <img class="py-2" src="{{ $top.FileNamePrefix }}{{ $v }}" style="object-fit:contain;height:150px;width:150px" />
+                {{ end }}
+                </div>
+            </div>
+            <div class="col">
+                <h2>{{ .Product.Title }}</h2>
+                <h2 class="py-4">
+                    {{if eq .Product.SellingPrice .Product.DiscountedPrice}}
+                        ${{printf "%.2f" .Product.SellingPrice}}
+                        </h2>
+                    {{ else }}
+                        <span class="text-danger">
+                              ${{printf "%.2f" .Product.DiscountedPrice}}
+                        </span>
+                        <s>
+                            ${{printf "%.2f" .Product.SellingPrice}}
+                        </s>
+                    {{ end }}
+                </h2>
+                <div class="py-4">{{ .Product.Description }}</div>
+                <form method="post" action="/order/{{ .Product.ProductID }}">
+                    <div class="row g-3 d-flex">
+                            <div class="col-sm-3">
+                                <label for="orderquantity" class="form-label">Order Quantity</label>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="number" class="form-control form-control-sm" name="orderquantity" id="orderquantity" value="1" min="1" max="{{ .Product.QuantityAvailable }}">
+                            </div>
+                            <div class="col-sm">
+                                <label for="orderquantity" class="form-label">{{ .Product.QuantityAvailable }} available</label>
+                            </div>
+                    </div>
+                    <div class="py-4">
+                        {{ .csrfField }}
+                        <button type="submit" class="btn btn-outline-primary" name="type" value="cart">Add To Cart</button>
+                        <button type="submit" class="btn btn-primary ms-5" name="type" value="buy">Buy It Now</button>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+{{ end }}
