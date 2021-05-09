@@ -1,43 +1,27 @@
 {{ define "content" }}
-    <div class="sidenav navbar-light bg-light d-none d-lg-block">
-        <ul class="navbar-nav ms-auto ps-4">
-            <li class="nav-item">
-                <a class="nav-link active" href="/admin/add_product">Add Product</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="/login">Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="/logout">Logout</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" href="/register">Register</a>
-            </li>
-        </ul>
-    </div>
-    <div class="main bg-light vh-100">
-        <h2 class="my-4">Admin Page</h2>
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <td>Created</td>
-                    <td>Name</td>
-                    <td>Quantity Available</td>
-                    <td>Edit</td>
-                    <td>Delete</td>
-                </tr>
-            </thead>
-            <tbody>
-            {{ range $i, $v := .AdminList }}
-                <tr>
-                    <td>{{ $v.Created }}</td>
-                    <td>{{ $v.Title }}</td>
-                    <td>{{ $v.QuantityAvailable }}</td>
-                    <td><a href="/admin/edit_product/{{ $v.ProductID }}">Edit</a></td>
-                    <td><a href="/admin/delete_product/{{ $v.ProductID }}">Delete</a></td>
-                </tr>
-            {{ end }}
-            </tbody>
-        </table>
-    </div>
+<div class="main">
+    <h2 class="my-4">Admin Page</h2>
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <td>Created</td>
+                <td>Name</td>
+                <td>Quantity Available</td>
+                <td>Edit</td>
+                <td>Delete</td>
+            </tr>
+        </thead>
+        <tbody>
+        {{ range $i, $v := .AdminList }}
+            <tr>
+                <td>{{ $v.Created }}</td>
+                <td>{{ $v.Title }}</td>
+                <td>{{ $v.QuantityAvailable }}</td>
+                <td><a href="/admin/edit_product/{{ $v.ProductID }}">Edit</a></td>
+                <td><a href="/admin/delete_product/{{ $v.ProductID }}">Delete</a></td>
+            </tr>
+        {{ end }}
+        </tbody>
+    </table>
+</div>
 {{ end }}

@@ -1,42 +1,35 @@
 {{ define "content" }}
-<div class="main bg-light vh-100">
-  {{if .error }}
-    <div class="alert alert-danger text-center" role="alert">
-      {{ .error }}
+<div class="main">
+  <h2 class="my-4">Registration Form</h2>
+  <form method="post" action="/register">
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input class="form-control form-control-sm" type="email" name="email" id="email" placeholder="user@example.com">
     </div>
-  {{ end }}
-  <section class="container">
-    <h2 class="my-4">Registration Form</h2>
-    <form method="post" action="/register">
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input class="form-control form-control-sm" type="email" name="email" id="email" placeholder="user@example.com">
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input class="form-control form-control-sm" type="password" name="password" id="password" aria-describedby="passwordHelp">
-        <div id="passwordHelp" class="form-text">Min 6 characters</div>
-      </div>
-      <div class="mb-3">
-        <label for="password2" class="form-label">Confirm Password</label>
-        <input class="form-control form-control-sm" type="password" name="password2" id="password2" aria-describedby="passwordHelp2">
-        <div id="passwordHelp2" class="form-text">Have to be same as password above</div>
-      </div>
-      <div class="mb-3">
-        <label for="name" class="form-label">Name</label>
-        <input class="form-control form-control-sm" type="text" name="name" id="name">
-      </div>
-      <div class="mb-3">
-        <label for="address" class="form-label">Address</label>
-        <input class="form-control form-control-sm" type="text" name="address" id="address">
-      </div>
-      <div class="mb-3">
-        <label for="phone" class="form-label">Phone</label>
-        <input class="form-control form-control-sm" type="text" name="phone" id="phone">
-      </div>
-      {{ .csrfField }}
-      <button type="submit" class="btn btn-primary">Register</button>
-    </form>
-  </section>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input class="form-control form-control-sm" type="password" name="password" id="password" aria-describedby="passwordHelp">
+      <div id="passwordHelp" class="form-text">Min 6 characters</div>
+    </div>
+    <div class="mb-3">
+      <label for="password2" class="form-label">Confirm Password</label>
+      <input class="form-control form-control-sm" type="password" name="password2" id="password2" aria-describedby="passwordHelp2">
+      <div id="passwordHelp2" class="form-text">Have to be same as password above</div>
+    </div>
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input class="form-control form-control-sm" type="text" name="name" id="name">
+    </div>
+    <div class="mb-3">
+      <label for="address" class="form-label">Address</label>
+      <input class="form-control form-control-sm" type="text" name="address" id="address">
+    </div>
+    <div class="mb-3">
+      <label for="phone" class="form-label">Phone</label>
+      <input class="form-control form-control-sm" type="text" name="phone" id="phone">
+    </div>
+    {{ .csrfField }}
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
 </div>
 {{ end }}
