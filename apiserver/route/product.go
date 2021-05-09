@@ -183,5 +183,13 @@ func ProductHandlerPUT(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProductHandlerDELETE(w http.ResponseWriter, r *http.Request) {
-	log.Println("here")
+	vars := mux.Vars(r)
+	productID := vars["id"]
+	q := "DELETE FROM PRODUCT WHERE PRODUCT_ID = (?)"
+	_, err := DB.Exec(q, productID)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

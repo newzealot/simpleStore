@@ -1,7 +1,6 @@
 package route
 
 import (
-	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"html/template"
@@ -25,9 +24,10 @@ func DeleteProductGET(w http.ResponseWriter, r *http.Request) {
 
 func DeleteProductPOST(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-
-	fmt.Println(r.PostFormValue("yesno"))
-	fmt.Sprintln()
+	if r.PostFormValue("yesno") == "no" {
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
 	at := r.Header.Get("Authorization")
 	at = strings.Replace(at, "Bearer ", "", 1)
 	vars := mux.Vars(r)

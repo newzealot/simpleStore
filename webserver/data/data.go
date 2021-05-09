@@ -43,6 +43,11 @@ type Product struct {
 	Created           time.Time
 }
 
+func (D2 *Data) FormattedDate() string {
+	loc, _ := time.LoadLocation("Asia/Singapore")
+	return D2.Created.In(loc).Format("02-Jan-06 15:04")
+}
+
 var D DataStore
 
 func partition(arr []string, leftIndex int, rightIndex int) int {
@@ -105,6 +110,10 @@ func (D *DataStore) GetAdmin(s string) []Data {
 			admin = append(admin, v)
 		}
 	}
+	// Sort by Created as map above disrupts order
+	sort.Slice(admin, func(i, j int) bool {
+		return admin[i].Created.After(admin[j].Created)
+	})
 	return admin
 }
 
@@ -121,6 +130,10 @@ func (D *DataStore) GetCollection(s string) []Data {
 			collection = append(collection, v)
 		}
 	}
+	// Sort by Created as map above disrupts order
+	sort.Slice(collection, func(i, j int) bool {
+		return collection[i].Created.After(collection[j].Created)
+	})
 	return collection
 }
 

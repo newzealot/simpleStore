@@ -25,7 +25,7 @@
         .sidenav {
             height: 100%;
             width: 200px;
-            position: fixed;
+            position: absolute;
             /*z-index: 0;*/
             top: 0;
             left: 0;
@@ -42,6 +42,11 @@
         .main {
             margin-left: 200px;
             margin-right: 200px;/* Same as the width of the sidenav */
+            padding: 10px 10px;
+        }
+        .index-main {
+            margin-left: 200px;
+            margin-right: 0px;/* Same as the width of the sidenav */
             padding: 10px 10px;
         }
         .navbar-brand {
@@ -62,7 +67,12 @@
             .main {
                 margin-left: 0px;
                 margin-right: 0px;
-                padding: 80px 10px;
+                padding: 10px 10px;
+            }
+            .index-main{
+                margin-left: 0px;
+                margin-right: 0px;
+                padding: 10px 10px;
             }
         }
     </style>
@@ -92,7 +102,7 @@
             </div>
         </div>
     </nav>
-    <div>
+    <div class="h-100 vh-100">
         {{if .success }}
             <div class="alert alert-success text-center" role="alert">
                 {{ .success }}
@@ -110,7 +120,6 @@
         {{ end }}
         {{ template "content" . }}
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
 </body>
 </html>
