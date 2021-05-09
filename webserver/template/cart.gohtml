@@ -1,0 +1,32 @@
+{{ define "content" }}
+    <div class="main">
+        <h2 class="my-4">Cart Page</h2>
+        <table class="caption-top table table-striped table-bordered table-hover">
+            <caption>Items In My Cart</caption>
+            <thead class="table-dark">
+            <tr>
+                <td>Title</td>
+                <td>Quantity Ordered</td>
+                <td>Selling Price</td>
+                <td>SubTotal</td>
+                <td>Delete</td>
+            </tr>
+            </thead>
+            <tbody>
+            {{ range $i, $v := .Cart }}
+                <tr>
+                    <td>{{ $v.Title }}</td>
+                    <td>{{ $v.OrderQuantity }}</td>
+                    <td>{{ $v.SellingPrice }}</td>
+                    <td>{{ $v.SubTotal }}</td>
+                    <td><a href="">Delete</a></td>
+                </tr>
+            {{ end }}
+            </tbody>
+        </table>
+        <div class="my-5">
+            Total Price: {{ printf "%.2f" .Total }}
+        </div>
+        <a href="" class="btn btn-primary" role="button">Buy Now</a>
+    </div>
+{{ end }}

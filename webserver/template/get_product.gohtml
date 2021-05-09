@@ -67,6 +67,8 @@
                             <div class="col-sm">
                                 <label for="orderquantity" class="form-label">{{ .Product.QuantityAvailable }} available</label>
                             </div>
+                            <input type="hidden" name="sellingprice" value="{{printf "%.2f" .Product.SellingPrice}}">
+                            <input type="hidden" name="title" value="{{.Product.Title}}">
                     </div>
                     <div class="py-4">
                         {{ .csrfField }}
