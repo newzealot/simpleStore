@@ -20,14 +20,14 @@
                     <p class="card-text text-center">{{$p.Title}}
                         <br />
                         {{if eq $p.SellingPrice $p.DiscountedPrice}}
-                        ${{$p.SellingPrice}}
+                        ${{printf "%.2f" $p.SellingPrice}}
                     </p>
                     {{ else }}
                         <span class="text-danger">
-                          ${{$p.DiscountedPrice}}
+                          ${{printf "%.2f" $p.DiscountedPrice}}
                       </span>
                         <s>
-                            ${{$p.SellingPrice}}
+                            ${{printf "%.2f" $p.SellingPrice}}
                         </s>
                         </p>
                     {{ end }}

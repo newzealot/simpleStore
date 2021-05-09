@@ -17,6 +17,7 @@ func main() {
 	protected := r.Host("localhost:8080").Subrouter()
 	protected.HandleFunc("/api/v1/product", ProductHandlerPOST).Methods("POST")
 	protected.HandleFunc("/api/v1/product/{id}", ProductHandlerPUT).Methods("PUT")
+	protected.HandleFunc("/api/v1/product/{id}", ProductHandlerDELETE).Methods("DELETE")
 	protected.HandleFunc("/api/v1/media/{id}/{filename}", MediaHandlerDELETE).Methods("DELETE")
 	protected.Use(Validation)
 

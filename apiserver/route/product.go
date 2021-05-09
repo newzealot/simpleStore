@@ -181,3 +181,7 @@ func ProductHandlerPUT(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+func ProductHandlerDELETE(w http.ResponseWriter, r *http.Request) {
+	log.Println("here")
+}

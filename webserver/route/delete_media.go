@@ -14,7 +14,7 @@ func DeleteMediaGET(w http.ResponseWriter, r *http.Request) {
 	at = strings.Replace(at, "Bearer ", "", 1)
 	vars := mux.Vars(r)
 	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", os.Getenv("APISERVER")+"/api/v1/media/"+vars["id"]+"/"+vars["filename"], strings.NewReader(r.PostForm.Encode()))
+	req, err := http.NewRequest("DELETE", os.Getenv("APISERVER")+"/api/v1/media/"+vars["id"]+"/"+vars["filename"], nil)
 	if err != nil {
 		log.Println(err)
 		http.Redirect(w, r, "/admin/edit_product/"+vars["id"]+"?error=Something went wrong", http.StatusSeeOther)
