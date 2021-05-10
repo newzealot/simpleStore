@@ -19,7 +19,15 @@ type Order struct {
 	OrderQuantity int
 	SellingPrice  float64
 	SubTotal      float64
-	FileName      string
+}
+
+type ConfirmedOrder struct {
+	ProductID         string
+	Title             string
+	OrderQuantity     int
+	QuantityAvailable int
+	SellingPrice      float64
+	FileName          string
 }
 
 type createCheckoutSessionResponse struct {
@@ -40,37 +48,35 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// verify orderList SellingPrice same as in DB and OrderQuantity less than in DB
-	var fileName string
-	var sellingPrice float64
-	var quantityAvailable int
+	confirmedList := []ConfirmedOrder{}
+	confirmed := ConfirmedOrder{}
 	for _, v := range orderList {
 		q := "CALL GET_PRODUCT_FOR_PAYMENT(?)"
 		row := DB.QueryRow(q, v.ProductID)
-		if err := row.Scan(&fileName, &sellingPrice, &quantityAvailable); err != nil {
+		if err := row.Scan(&confirmed.ProductID, &confirmed.Title, &confirmed.FileName, &confirmed.SellingPrice, &confirmed.QuantityAvailable); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		fileName = fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), v.ProductID, url.QueryEscape(fileName))
-		v.FileName = fileName
-		if sellingPrice != v.SellingPrice {
+		confirmed.FileName = fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), confirmed.ProductID, url.QueryEscape(confirmed.FileName))
+		log.Println(confirmed.FileName)
+		if confirmed.SellingPrice != v.SellingPrice {
 			log.Println(err)
 			w.WriteHeader(http.StatusConflict)
 			return
 		}
-		if quantityAvailable < v.OrderQuantity {
+		if confirmed.QuantityAvailable < v.OrderQuantity {
 			log.Println(err)
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
-		log.Println(v.FileName)
+		confirmed.OrderQuantity = v.OrderQuantity
+		confirmedList = append(confirmedList, confirmed)
 	}
 	// stripe integration
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
-
 	LineItems := []*stripe.CheckoutSessionLineItemParams{}
-	for _, v := range orderList {
-		log.Println(v.FileName)
+	for _, v := range confirmedList {
 		item := &stripe.CheckoutSessionLineItemParams{
 			PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
 				Currency: stripe.String(string(stripe.CurrencySGD)),

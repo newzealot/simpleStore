@@ -12,7 +12,6 @@ import (
 )
 
 func FulfillOrder(returnedSession stripe.CheckoutSession) error {
-
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	params := &stripe.CheckoutSessionParams{}
 	params.AddExpand("line_items")
