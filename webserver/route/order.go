@@ -29,10 +29,6 @@ func OrderPOST(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/product/"+vars["id"]+"error?Order quantity not integer", http.StatusSeeOther)
 		return
 	}
-	if r.PostFormValue("type") == "buy" {
-		// TODO send to buy route
-		return
-	}
 	order := Order{
 		vars["id"],
 		t,
@@ -58,7 +54,6 @@ func OrderPOST(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	orderList = append(orderList, order)
-	log.Println(orderList)
 	j, err := json.Marshal(orderList)
 	jbase := base64.StdEncoding.EncodeToString(j)
 	if err != nil {
@@ -74,6 +69,11 @@ func OrderPOST(w http.ResponseWriter, r *http.Request) {
 		Expires:  time.Now().AddDate(0, 0, 7),
 	}
 	http.SetCookie(w, &c)
-	http.Redirect(w, r, "/product/"+vars["id"]+"?success=Added product to cart", http.StatusSeeOther)
-	return
+	if r.PostFormValue("type") == "buy" {
+		http.Redirect(w, r, "/checkout", http.StatusSeeOther)
+		return
+	} else {
+		http.Redirect(w, r, "/product/"+vars["id"]+"?success=Added product to cart", http.StatusSeeOther)
+		return
+	}
 }

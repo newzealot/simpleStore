@@ -1,0 +1,61 @@
+package route
+
+import (
+	"bytes"
+	"encoding/base64"
+	"encoding/json"
+	"log"
+	"net/http"
+	"os"
+	. "simpleStore/webserver/data"
+)
+
+func CheckoutGET(w http.ResponseWriter, r *http.Request) {
+	orderList := []Order{}
+	cart, err := r.Cookie("Cart")
+	if err != nil {
+		log.Println("No cookie")
+		http.Redirect(w, r, "/cart?error=Empty cart", http.StatusSeeOther)
+		return
+	} else {
+		j, err := base64.StdEncoding.DecodeString(cart.Value)
+		if err != nil {
+			log.Println(err)
+			http.Redirect(w, r, "/cart?error=Cannot decode base64 string", http.StatusSeeOther)
+			return
+		}
+		if err := json.Unmarshal(j, &orderList); err != nil {
+			log.Println(err)
+			http.Redirect(w, r, "/cart?error=Cannot unmarshall json", http.StatusSeeOther)
+			return
+		}
+	}
+	j, err := json.Marshal(orderList)
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/cart?error=Cannot marshall json", http.StatusSeeOther)
+		return
+	}
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", os.Getenv("APISERVER")+"/api/v1/checkout", bytes.NewBuffer(j))
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/cart?error=?error=Something went wrong", http.StatusSeeOther)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+
+	}
+	log.Printf("Successfully checkout")
+	D.GetData()
+	http.Redirect(w, r, "/cart?success=Successfully checkout", http.StatusSeeOther)
+	return
+}

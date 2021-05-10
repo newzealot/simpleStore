@@ -30,7 +30,6 @@ func CartGET(w http.ResponseWriter, r *http.Request) {
 	for _, v := range orderList {
 		total += v.SubTotal
 	}
-	log.Println(total)
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/cart.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
 		"Cart":    orderList,

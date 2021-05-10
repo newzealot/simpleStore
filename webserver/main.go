@@ -25,6 +25,7 @@ func main() {
 	protected.Use(AccessTokenCheck)
 	r.HandleFunc("/contact", ContactGET).Methods("GET")
 	r.HandleFunc("/cart", CartGET).Methods("GET")
+	r.HandleFunc("/checkout", CheckoutGET).Methods("GET")
 	r.HandleFunc("/login", LoginGET).Methods("GET")
 	r.HandleFunc("/login", LoginPOST).Methods("POST")
 	r.HandleFunc("/logout", LogoutGET).Methods("GET")

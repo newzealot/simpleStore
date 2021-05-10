@@ -10,11 +10,14 @@
             <label for="description" class="form-label">Description</label>
             <textarea class="form-control form-control-sm" name="description" id="description" rows="5" placeholder="{{ .Product.Description }}">{{ .Product.Description }}</textarea>
         </div>
-        <div class="text-danger">Product needs at least one picture. Please do not delete until there are no pictures left.</div>
+        <div class="text-danger">Product needs at least one picture. Not allowed to delete if only one picture left.</div>
         {{ $top := .Product }}
         {{ range $i, $v := .Product.FileName }}
         <div>
-            <img class="p-3" src="{{ $top.FileNamePrefix }}{{ $v }}" style="object-fit:contain;width:9rem;"><a href="/admin/delete_media/{{ $top.ProductID }}/{{ $v }}">Delete</a>
+            <img class="p-3" src="{{ $top.FileNamePrefix }}{{ $v }}" style="object-fit:contain;width:9rem;">
+            {{ if ne (len $top.FileName) 1 }}
+            <a href="/admin/delete_media/{{ $top.ProductID }}/{{ $v }}">Delete</a>
+            {{ end }}
         </div>
         {{ end }}
         <div class="mb-3">
