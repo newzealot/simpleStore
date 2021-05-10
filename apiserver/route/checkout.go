@@ -82,9 +82,9 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 				Currency: stripe.String(string(stripe.CurrencySGD)),
 				ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
 					Name: stripe.String(v.Title),
-					Metadata: map[string]string{
-						"ProductID": v.ProductID,
-					},
+					//Metadata: map[string]string{
+					//	"ProductID": v.ProductID,
+					//},
 					Images: stripe.StringSlice([]string{v.FileName}),
 				},
 				UnitAmount: stripe.Int64(int64(v.SellingPrice * 100)),
@@ -103,6 +103,8 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		SuccessURL: stripe.String("https://www.google.com/"),
 		CancelURL:  stripe.String("https://www.bing.com/"),
 	}
+	// TODO design metadata field
+	params.AddMetadata("ProductID", "Calvin")
 	session, err := session.New(params)
 	if err != nil {
 		log.Printf("session.New: %v", err)

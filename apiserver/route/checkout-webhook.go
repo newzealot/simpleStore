@@ -19,12 +19,16 @@ func FulfillOrder(returnedSession stripe.CheckoutSession) error {
 	if err != nil {
 		return err
 	}
+	log.Println(s.Metadata)
+	log.Println(s)
 	for _, v := range s.LineItems.Data {
-		log.Println(v.Description)
-		log.Println(v.Quantity)
-		log.Println(v.Price.UnitAmount)
-		log.Println(v.Price.Metadata["ProductID"])
-		log.Println(v.Price.Metadata)
+		log.Printf("%#v", v)
+		log.Printf("%#v", v.Price)
+		//log.Println(v.Description)
+		//log.Println(v.Quantity)
+		//log.Println(v.Price.UnitAmount)
+		//log.Println(v.Price.Metadata["ProductID"])
+		//log.Println(v.Price.Metadata)
 	}
 	return nil
 }
