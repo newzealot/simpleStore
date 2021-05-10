@@ -70,7 +70,7 @@ func OrderPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, &c)
 	if r.PostFormValue("type") == "buy" {
-		http.Redirect(w, r, "/checkout", http.StatusSeeOther)
+		http.Redirect(w, r, "/cart", http.StatusSeeOther)
 		return
 	} else {
 		http.Redirect(w, r, "/product/"+vars["id"]+"?success=Added product to cart", http.StatusSeeOther)

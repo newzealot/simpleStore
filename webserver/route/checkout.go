@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	. "simpleStore/webserver/data"
 )
 
 func CheckoutGET(w http.ResponseWriter, r *http.Request) {
+	log.Println("in here")
 	orderList := []Order{}
 	cart, err := r.Cookie("Cart")
 	if err != nil {
@@ -47,15 +48,32 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
-		http.Redirect(w, r, "/cart?error=?error=Something went wrong", http.StatusSeeOther)
+		http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
 		return
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-
+		log.Println(err)
+		http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
+		return
 	}
-	log.Printf("Successfully checkout")
-	D.GetData()
-	http.Redirect(w, r, "/cart?success=Successfully checkout", http.StatusSeeOther)
+	//if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	//	log.Println(err)
+	//	http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
+	//	return
+	//}
+	js, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
+		return
+	}
+	//js, _ := json.Marshal(data)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
+	//log.Println(data)
+	//log.Printf("Successfully checkout")
+	//D.GetData()
+	//http.Redirect(w, r, "/cart?success=Successfully checkout", http.StatusSeeOther)
 	return
 }

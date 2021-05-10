@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 )
 
 func CartGET(w http.ResponseWriter, r *http.Request) {
@@ -32,9 +33,10 @@ func CartGET(w http.ResponseWriter, r *http.Request) {
 	}
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/cart.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
-		"Cart":    orderList,
-		"error":   r.URL.Query().Get("error"),
-		"success": r.URL.Query().Get("success"),
-		"Total":   total,
+		"Cart":      orderList,
+		"error":     r.URL.Query().Get("error"),
+		"success":   r.URL.Query().Get("success"),
+		"Total":     total,
+		"StripeKey": os.Getenv("STRIPE_PUBLIC_KEY"),
 	})
 }
