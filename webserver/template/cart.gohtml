@@ -27,17 +27,21 @@
         <div class="my-5">
             Total Price: {{ printf "%.2f" .Total }}
         </div>
-{{/*        <a href="/checkout" class="btn btn-primary" role="button">Make Payment</a>*/}}
+        {{ .csrfField }}
         <button type="button" class="btn btn-primary" id="checkout-button">Make Payment</button>
     </div>
     <script type="text/javascript">
         // Create an instance of the Stripe object with your publishable API key
+        let csrfToken = document.getElementsByName("gorilla.csrf.Token")[0].value
         var stripe = Stripe("{{ .StripeKey }}");
         var checkoutButton = document.getElementById("checkout-button");
 
         checkoutButton.addEventListener("click", function () {
             fetch("/checkout", {
-                method: "GET",
+                method: "POST",
+                headers: {
+                    'X-CSRF-Token': csrfToken
+                },
             })
                 .then(function (response) {
                     return response.json();

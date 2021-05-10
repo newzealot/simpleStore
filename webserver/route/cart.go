@@ -3,6 +3,7 @@ package route
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/gorilla/csrf"
 	"html/template"
 	"log"
 	"net/http"
@@ -33,10 +34,11 @@ func CartGET(w http.ResponseWriter, r *http.Request) {
 	}
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/cart.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
-		"Cart":      orderList,
-		"error":     r.URL.Query().Get("error"),
-		"success":   r.URL.Query().Get("success"),
-		"Total":     total,
-		"StripeKey": os.Getenv("STRIPE_PUBLIC_KEY"),
+		csrf.TemplateTag: csrf.TemplateField(r),
+		"Cart":           orderList,
+		"error":          r.URL.Query().Get("error"),
+		"success":        r.URL.Query().Get("success"),
+		"Total":          total,
+		"StripeKey":      os.Getenv("STRIPE_PUBLIC_KEY"),
 	})
 }

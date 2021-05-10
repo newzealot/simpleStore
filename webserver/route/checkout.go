@@ -8,9 +8,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	. "simpleStore/webserver/data"
 )
 
-func CheckoutGET(w http.ResponseWriter, r *http.Request) {
+func CheckoutPOST(w http.ResponseWriter, r *http.Request) {
 	log.Println("in here")
 	orderList := []Order{}
 	cart, err := r.Cookie("Cart")
@@ -57,23 +58,16 @@ func CheckoutGET(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
 		return
 	}
-	//if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-	//	log.Println(err)
-	//	http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
-	//	return
-	//}
 	js, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Println(err)
 		http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
 		return
 	}
-	//js, _ := json.Marshal(data)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-	//log.Println(data)
-	//log.Printf("Successfully checkout")
-	//D.GetData()
+	log.Printf("Successfully checkout")
+	D.GetData()
 	//http.Redirect(w, r, "/cart?success=Successfully checkout", http.StatusSeeOther)
 	return
 }
