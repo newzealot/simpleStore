@@ -12,7 +12,6 @@ import (
 )
 
 func CheckoutPOST(w http.ResponseWriter, r *http.Request) {
-	log.Println("in here")
 	orderList := []Order{}
 	cart, err := r.Cookie("Cart")
 	if err != nil {
@@ -66,8 +65,6 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
-	log.Printf("Successfully checkout")
 	D.GetData()
-	//http.Redirect(w, r, "/cart?success=Successfully checkout", http.StatusSeeOther)
 	return
 }

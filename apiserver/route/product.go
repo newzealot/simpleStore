@@ -11,6 +11,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	. "simpleStore/apiserver/db"
 	"strconv"
 )
@@ -89,15 +90,27 @@ func AddToStorage(productid string, files []*multipart.FileHeader) error {
 	uploader := s3manager.NewUploader(sess)
 	for i := range files {
 		filename := files[i].Filename
+		contentType := ""
+		switch filepath.Ext(filename) {
+		case ".gif":
+			contentType = "image/gif"
+		case ".jpg", ".jpeg":
+			contentType = "image/jpeg"
+		case ".png":
+			contentType = "image/png"
+		case ".webp":
+			contentType = "image/webp"
+		}
 		storageKey := fmt.Sprintf("%s/%s", productid, filename)
 		file, err := files[i].Open()
 		if err != nil {
 			return err
 		}
 		_, err = uploader.Upload(&s3manager.UploadInput{
-			Bucket: aws.String(os.Getenv("AWS_S3_BUCKET_NAME")),
-			Key:    aws.String(storageKey),
-			Body:   file,
+			Bucket:      aws.String(os.Getenv("AWS_S3_BUCKET_NAME")),
+			Key:         aws.String(storageKey),
+			Body:        file,
+			ContentType: aws.String(contentType),
 		})
 		if err != nil {
 			file.Close()

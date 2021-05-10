@@ -2,11 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/checkout/session"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	. "simpleStore/apiserver/db"
 )
@@ -17,6 +19,7 @@ type Order struct {
 	OrderQuantity int
 	SellingPrice  float64
 	SubTotal      float64
+	FileName      string
 }
 
 type createCheckoutSessionResponse struct {
@@ -24,7 +27,6 @@ type createCheckoutSessionResponse struct {
 }
 
 func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("in here")
 	orderList := []Order{}
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -37,18 +39,20 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Println(orderList)
 	// verify orderList SellingPrice same as in DB and OrderQuantity less than in DB
+	var fileName string
 	var sellingPrice float64
 	var quantityAvailable int
 	for _, v := range orderList {
-		q := "SELECT PRODUCT.SELLINGPRICE, PRODUCT_QUANTITY.QUANTITYAVAILABLE FROM PRODUCT INNER JOIN PRODUCT_QUANTITY ON PRODUCT.PRODUCT_ID = PRODUCT_QUANTITY.PRODUCT_ID WHERE PRODUCT.PRODUCT_ID = (?)"
+		q := "CALL GET_PRODUCT_FOR_PAYMENT(?)"
 		row := DB.QueryRow(q, v.ProductID)
-		if err := row.Scan(&sellingPrice, &quantityAvailable); err != nil {
+		if err := row.Scan(&fileName, &sellingPrice, &quantityAvailable); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		fileName = fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), v.ProductID, url.QueryEscape(fileName))
+		v.FileName = fileName
 		if sellingPrice != v.SellingPrice {
 			log.Println(err)
 			w.WriteHeader(http.StatusConflict)
@@ -59,16 +63,23 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
+		log.Println(v.FileName)
 	}
 	// stripe integration
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+
 	LineItems := []*stripe.CheckoutSessionLineItemParams{}
 	for _, v := range orderList {
+		log.Println(v.FileName)
 		item := &stripe.CheckoutSessionLineItemParams{
 			PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
 				Currency: stripe.String(string(stripe.CurrencySGD)),
 				ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
 					Name: stripe.String(v.Title),
+					Metadata: map[string]string{
+						"ProductID": v.ProductID,
+					},
+					Images: stripe.StringSlice([]string{v.FileName}),
 				},
 				UnitAmount: stripe.Int64(int64(v.SellingPrice * 100)),
 			},
@@ -93,8 +104,6 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	data := createCheckoutSessionResponse{
 		SessionID: session.ID,
 	}
-	log.Println("session: ", session)
-	log.Println("data: ", data)
 	js, _ := json.Marshal(data)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
