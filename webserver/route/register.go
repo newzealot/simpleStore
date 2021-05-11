@@ -6,13 +6,20 @@ import (
 	"log"
 	"net/http"
 	"os"
+	. "simpleStore/webserver/middleware"
 	"strings"
 )
 
 func RegisterGET(w http.ResponseWriter, r *http.Request) {
+	u := UserInfo{
+		Type:  r.Header.Get("SimpleStoreUserType"),
+		ID:    r.Header.Get("SimpleStoreUserID"),
+		Email: r.Header.Get("SimpleStoreUserEmail"),
+	}
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/register.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
+		"User":           u,
 		"error":          r.URL.Query().Get("error"),
 	})
 }

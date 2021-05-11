@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	. "simpleStore/webserver/middleware"
 	"time"
 )
 
@@ -36,6 +37,12 @@ func deleteItemFromCart(toDelete string, orderList []Order) (http.Cookie, error)
 }
 
 func CartGET(w http.ResponseWriter, r *http.Request) {
+	u := UserInfo{
+		Type:  r.Header.Get("SimpleStoreUserType"),
+		ID:    r.Header.Get("SimpleStoreUserID"),
+		Email: r.Header.Get("SimpleStoreUserEmail"),
+	}
+	log.Println(r.Header.Get("SimpleStoreUserType"))
 	toDelete := r.URL.Query().Get("delete")
 	orderList := []Order{}
 	cart, err := r.Cookie("Cart")
@@ -72,6 +79,7 @@ func CartGET(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/cart.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
+		"User":           u,
 		"Cart":           orderList,
 		"error":          r.URL.Query().Get("error"),
 		"success":        r.URL.Query().Get("success"),

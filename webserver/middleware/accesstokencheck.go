@@ -16,7 +16,7 @@ import (
 type UserInfo struct {
 	Type  string
 	ID    string
-	email string
+	Email string
 }
 
 func VerifyAccessToken(token_use string, at string) (UserInfo, error) {
@@ -31,7 +31,6 @@ func VerifyAccessToken(token_use string, at string) (UserInfo, error) {
 	p, err := jwt.Parse(src,
 		jwt.WithKeySet(keyset),
 		jwt.WithValidate(true),
-		jwt.WithClaimValue("client_id", os.Getenv("AWS_COGNITO_APP_CLIENT_ID")), // replacing aud
 		jwt.WithIssuer(iss),
 		jwt.WithClaimValue("token_use", token_use),
 	)
@@ -47,7 +46,7 @@ func VerifyAccessToken(token_use string, at string) (UserInfo, error) {
 	result, _ = p.Get("cognito:username")
 	u.ID = fmt.Sprint(result)
 	result, _ = p.Get("email")
-	u.email = fmt.Sprint(result)
+	u.Email = fmt.Sprint(result)
 	return u, nil
 }
 
@@ -119,6 +118,8 @@ func AccessTokenCheck(next http.Handler) http.Handler {
 			http.SetCookie(w, &c2)
 			at = &c1
 			log.Println("Cookies set")
+			http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
+			return
 		}
 		// verify AccessToken
 		u, err := VerifyAccessToken("access", at.Value)
@@ -134,11 +135,15 @@ func AccessTokenCheck(next http.Handler) http.Handler {
 			return
 		}
 		log.Println("AccessToken and IdToken valid")
+		if u.Type == "customer" {
+			log.Println("Trying to access admin as customer")
+			http.Redirect(w, r, "/?error=Trying to access admin as customer", http.StatusSeeOther)
+		}
 		r.Header.Add("Authorization", "Bearer "+at.Value)
-		// setting merchantID in header
+		// setting UserInfo in header
 		r.Header.Add("SimpleStoreUserType", u.Type)
 		r.Header.Add("SimpleStoreUserID", u.ID)
-		r.Header.Add("SimpleStoreUserEmail", u.email)
+		r.Header.Add("SimpleStoreUserEmail", u.Email)
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(w, r)
 	})

@@ -89,24 +89,46 @@
             </button>
             <div class="collapse navbar-collapse text-right" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    {{ if .User.Type }}
+                        {{ if eq .User.Type "merchant"}}
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin">{{ .User.Email }}</a>
+                        </li>
+                        {{ else }}
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/cart">{{ .User.Email }}</a>
+                        </li>
+                        {{ end }}
+                    {{ end }}
+                    {{ if eq .User.Type "merchant"}}
                     <li class="nav-item">
                         <a class="nav-link active" href="/admin">Admin</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/login">Login</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link active" href="/logout">Logout</a>
+                    </li>
+                    {{ end }}
+                    {{ if not .User.Type }}
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/login">Login</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="/register">Register</a>
                     </li>
+                    {{ end }}
+                    {{ if eq .User.Type "customer"}}
                     <li class="nav-item">
-                        <a class="nav-link active" href="/contact">Contact</a>
+                        <a class="nav-link active" href="/logout">Logout</a>
                     </li>
+                    {{ end }}
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/about">About</a>
+                    </li>
+                    {{ if ne .User.Type "merchant"}}
                     <li class="nav-item">
                         <a class="nav-link active" href="/cart">Cart</a>
                     </li>
+                    {{ end }}
                 </ul>
             </div>
         </div>

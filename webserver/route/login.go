@@ -8,14 +8,21 @@ import (
 	"log"
 	"net/http"
 	"os"
+	. "simpleStore/webserver/middleware"
 	"strings"
 	"time"
 )
 
 func LoginGET(w http.ResponseWriter, r *http.Request) {
+	u := UserInfo{
+		Type:  r.Header.Get("SimpleStoreUserType"),
+		ID:    r.Header.Get("SimpleStoreUserID"),
+		Email: r.Header.Get("SimpleStoreUserEmail"),
+	}
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/login.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
 		csrf.TemplateTag: csrf.TemplateField(r),
+		"User":           u,
 		"error":          r.URL.Query().Get("error"),
 		"info":           r.URL.Query().Get("info"),
 	})

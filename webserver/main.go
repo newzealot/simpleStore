@@ -23,7 +23,7 @@ func main() {
 	protected.HandleFunc("/admin/delete_product/{id}", DeleteProductPOST).Methods("POST")
 	protected.HandleFunc("/admin/delete_media/{id}/{filename}", DeleteMediaGET).Methods("GET")
 	protected.Use(AccessTokenCheck)
-	r.HandleFunc("/contact", ContactGET).Methods("GET")
+	r.HandleFunc("/about", AboutGET).Methods("GET")
 	r.HandleFunc("/cart", CartGET).Methods("GET")
 	r.HandleFunc("/checkout", CheckoutPOST).Methods("POST")
 	r.HandleFunc("/login", LoginGET).Methods("GET")
@@ -35,6 +35,7 @@ func main() {
 	r.HandleFunc("/collection/{id}", CollectionGET).Methods("GET")
 	r.HandleFunc("/order/{id}", OrderPOST).Methods("POST")
 	r.HandleFunc("/", IndexGET).Methods("GET")
+	r.Use(GetUserInfo)
 
 	if err := http.ListenAndServe(":5000", csrf.Protect([]byte("32-byte-long-auth-key"))(r)); err != nil {
 		log.Fatalln(err)

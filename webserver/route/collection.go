@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	. "simpleStore/webserver/data"
+	. "simpleStore/webserver/middleware"
 )
 
 func CollectionGET(w http.ResponseWriter, r *http.Request) {
@@ -13,8 +14,14 @@ func CollectionGET(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
+	u := UserInfo{
+		Type:  r.Header.Get("SimpleStoreUserType"),
+		ID:    r.Header.Get("SimpleStoreUserID"),
+		Email: r.Header.Get("SimpleStoreUserEmail"),
+	}
 	t, _ := template.ParseFiles("template/layout.gohtml", "template/collection.gohtml")
 	t.ExecuteTemplate(w, "layout", map[string]interface{}{
+		"User":         u,
 		"Collections":  D.GetMenu(),
 		"ProductStore": D.GetCollection(vars["id"]),
 		"CollectionID": vars["id"],
