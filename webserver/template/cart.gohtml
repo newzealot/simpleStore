@@ -19,7 +19,7 @@
                     <td>{{ $v.OrderQuantity }}</td>
                     <td>{{ $v.SellingPrice }}</td>
                     <td>{{ $v.SubTotal }}</td>
-                    <td><a href="">Delete</a></td>
+                    <td><a href="/cart?delete={{ $v.ProductID }}">Delete</a></td>
                 </tr>
             {{ end }}
             </tbody>
@@ -28,7 +28,7 @@
             Total Price: {{ printf "%.2f" .Total }}
         </div>
         {{ .csrfField }}
-        <button type="button" class="btn btn-primary" id="checkout-button">Make Payment</button>
+        <button type="button" class="btn btn-primary" id="checkout-button" {{ if not .Cart }} disabled {{ end }}}>Make Payment</button>
     </div>
     <script type="text/javascript">
         // Create an instance of the Stripe object with your publishable API key
