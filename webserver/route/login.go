@@ -92,5 +92,5 @@ func LoginPOST(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &c2)
 	http.SetCookie(w, &c3)
 	log.Println("Cookies set")
-	http.Redirect(w, r, "/admin", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

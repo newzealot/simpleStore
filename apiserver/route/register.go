@@ -15,14 +15,16 @@ import (
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	clientId := os.Getenv("AWS_COGNITO_APP_CLIENT_ID")
 	r.ParseForm()
+	userType := r.Form.Get("type")
 	username := r.Form.Get("email")
 	password := r.Form.Get("password")
 	password2 := r.Form.Get("password2")
 	address := r.Form.Get("address")
 	phone := r.Form.Get("phone")
 	name := r.Form.Get("name")
+	log.Println(userType)
 	if password != password2 {
-		log.Println("Unable to register merchant - Passwords do not match")
+		log.Println("Unable to register user - Passwords do not match")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -39,13 +41,13 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		UserAttributes: []*cognito.AttributeType{
 			{
 				Name:  aws.String("custom:type"),
-				Value: aws.String("merchant"),
+				Value: aws.String(userType),
 			},
 		},
 	}
 	result, err := cognito.New(sess).SignUp(user)
 	if err != nil {
-		log.Printf("Unable to register merchant - %s\n", err)
+		log.Printf("Unable to user merchant - %s\n", err)
 		switch err.(awserr.Error).Code() {
 		case "InvalidPasswordException":
 			w.WriteHeader(http.StatusBadRequest)
@@ -58,8 +60,13 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	// insert into merchant table
-	q := "INSERT INTO MERCHANT(MERCHANT_ID,EMAIL,NAME,ADDRESS,PHONE) VALUES (?,?,?,?,?)"
+	// insert into appropriate table
+	q := "INSERT INTO CUSTOMER(CUSTOMER_ID,EMAIL,NAME,ADDRESS,PHONE) VALUES (?,?,?,?,?)"
+	if userType == "merchant" {
+		q = "INSERT INTO MERCHANT(MERCHANT_ID,EMAIL,NAME,ADDRESS,PHONE) VALUES (?,?,?,?,?)"
+	}
+	// result.UserSub is the Cognito returned unique user id
+	// Username actually means email of user (we are using email as username here)
 	res, err := DB.Exec(q, result.UserSub, username, name, address, phone)
 	if err != nil {
 		log.Println(err)
@@ -67,7 +74,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected == 0 {
-		log.Println(fmt.Errorf("MERCHANT table 0 rows affected or %s\n", err))
+		log.Println(fmt.Errorf("0 rows affected or %s\n", err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

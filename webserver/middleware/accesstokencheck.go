@@ -13,11 +13,18 @@ import (
 	"time"
 )
 
-func VerifyAccessToken(at string) (string, error) {
+type UserInfo struct {
+	Type  string
+	ID    string
+	email string
+}
+
+func VerifyAccessToken(token_use string, at string) (UserInfo, error) {
+	u := UserInfo{}
 	url := fmt.Sprintf("https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json", os.Getenv("AWS_REGION"), os.Getenv("AWS_COGNITO_USER_POOL_ID"))
 	keyset, err := jwk.Fetch(context.Background(), url)
 	if err != nil {
-		return "", err
+		return u, err
 	}
 	src := []byte(at)
 	iss := fmt.Sprintf("https://cognito-idp.%s.amazonaws.com/%s", os.Getenv("AWS_REGION"), os.Getenv("AWS_COGNITO_USER_POOL_ID"))
@@ -26,16 +33,22 @@ func VerifyAccessToken(at string) (string, error) {
 		jwt.WithValidate(true),
 		jwt.WithClaimValue("client_id", os.Getenv("AWS_COGNITO_APP_CLIENT_ID")), // replacing aud
 		jwt.WithIssuer(iss),
-		jwt.WithClaimValue("token_use", "access"),
+		jwt.WithClaimValue("token_use", token_use),
 	)
 	if err != nil {
-		return "", err
+		return u, err
 	}
-	m, ok := p.Get("username")
-	if !ok {
-		log.Println("No username field")
+	// no futher processing if access token
+	if token_use == "access" {
+		return u, nil
 	}
-	return fmt.Sprint(m), nil
+	result, _ := p.Get("custom:type")
+	u.Type = fmt.Sprint(result)
+	result, _ = p.Get("cognito:username")
+	u.ID = fmt.Sprint(result)
+	result, _ = p.Get("email")
+	u.email = fmt.Sprint(result)
+	return u, nil
 }
 
 // AccessTokenCheck makes sure that protected route contains a valid Access Token.
@@ -48,9 +61,10 @@ func AccessTokenCheck(next http.Handler) http.Handler {
 			http.Redirect(w, r, "/login?status="+"Please login first", http.StatusSeeOther)
 			return
 		}
-		at, err := r.Cookie("AccessToken")
-		if err != nil {
-			// get new AccessToken using RefreshToken
+		at, err1 := r.Cookie("AccessToken")
+		it, err2 := r.Cookie("IdToken")
+		if err1 != nil || err2 != nil {
+			// get new Tokens using RefreshToken
 			client := &http.Client{}
 			req, err := http.NewRequest("POST", os.Getenv("APISERVER")+"/api/v1/refresh", nil)
 			if err != nil {
@@ -107,16 +121,24 @@ func AccessTokenCheck(next http.Handler) http.Handler {
 			log.Println("Cookies set")
 		}
 		// verify AccessToken
-		merchantID, err := VerifyAccessToken(at.Value)
+		u, err := VerifyAccessToken("access", at.Value)
 		if err != nil {
 			log.Println(err)
 			http.Redirect(w, r, "/login?status="+"Please login first", http.StatusSeeOther)
 			return
 		}
-		log.Println("AccessToken valid")
+		u, err = VerifyAccessToken("id", it.Value)
+		if err != nil {
+			log.Println(err)
+			http.Redirect(w, r, "/login?status="+"Please login first", http.StatusSeeOther)
+			return
+		}
+		log.Println("AccessToken and IdToken valid")
 		r.Header.Add("Authorization", "Bearer "+at.Value)
 		// setting merchantID in header
-		r.Header.Add("merchantID", merchantID)
+		r.Header.Add("SimpleStoreUserType", u.Type)
+		r.Header.Add("SimpleStoreUserID", u.ID)
+		r.Header.Add("SimpleStoreUserEmail", u.email)
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(w, r)
 	})
