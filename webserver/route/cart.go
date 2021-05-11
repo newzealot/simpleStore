@@ -42,7 +42,10 @@ func CartGET(w http.ResponseWriter, r *http.Request) {
 		ID:    r.Header.Get("SimpleStoreUserID"),
 		Email: r.Header.Get("SimpleStoreUserEmail"),
 	}
-	log.Println(r.Header.Get("SimpleStoreUserType"))
+	if u.Type == "merchant" {
+		log.Println("merchant do not have access to cart")
+		http.Redirect(w, r, "/?error=Trying to access cart with merchant account", http.StatusSeeOther)
+	}
 	toDelete := r.URL.Query().Get("delete")
 	orderList := []Order{}
 	cart, err := r.Cookie("Cart")

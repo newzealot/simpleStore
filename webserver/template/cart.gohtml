@@ -28,7 +28,10 @@
             Total Price: {{ printf "%.2f" .Total }}
         </div>
         {{ .csrfField }}
-        <button type="button" class="btn btn-primary" id="checkout-button" {{ if not .Cart }} disabled {{ end }}}>Make Payment</button>
+        {{ if ne .User.Type "customer"}}
+            <div class="my-5"> Please <a href="/login">Login</a> or <a href="/register">Register</a> in order to Make Payment </div>
+        {{ end }}
+        <button type="button" class="btn btn-primary" id="checkout-button" {{ if or (ne .User.Type "customer") (not .Cart) }} disabled {{ end }} >Make Payment</button>
     </div>
     <script type="text/javascript">
         // Create an instance of the Stripe object with your publishable API key
