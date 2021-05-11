@@ -9,9 +9,12 @@ import (
 	"net/http"
 	"os"
 	. "simpleStore/webserver/data"
+	"strings"
 )
 
 func CheckoutPOST(w http.ResponseWriter, r *http.Request) {
+	at := r.Header.Get("Authorization")
+	at = strings.Replace(at, "Bearer ", "", 1)
 	orderList := []Order{}
 	cart, err := r.Cookie("Cart")
 	if err != nil {
@@ -45,6 +48,7 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+at)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)

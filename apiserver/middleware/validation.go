@@ -42,14 +42,14 @@ func Validation(next http.Handler) http.Handler {
 		log.Println("ValidationMiddleWare")
 		at := r.Header.Get("Authorization")
 		at = strings.Replace(at, "Bearer ", "", 1)
-		merchantID, err := VerifyAccessToken(at)
+		userID, err := VerifyAccessToken(at)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		// setting username in header
-		r.Header.Add("merchantID", fmt.Sprint(merchantID))
+		r.Header.Add("userID", fmt.Sprint(userID))
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(w, r)
 	})

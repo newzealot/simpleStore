@@ -21,7 +21,7 @@ type ProductMedia struct {
 	Filename  string
 }
 
-func QueryDB(productid string, merchantid string, q string, values map[string][]string) error {
+func QueryDB(productid string, userID string, q string, values map[string][]string) error {
 	singleMap := map[string]string{}
 	for k, v := range values {
 		if len(v) != 1 {
@@ -30,7 +30,7 @@ func QueryDB(productid string, merchantid string, q string, values map[string][]
 		singleMap[k] = values[k][0][1 : len(values[k][0])-1]
 		log.Println(singleMap[k])
 	}
-	log.Println(merchantid)
+	log.Println(userID)
 	sellingPrice, err := strconv.ParseFloat(singleMap["sellingprice"], 64)
 	if err != nil {
 		return err
@@ -66,7 +66,7 @@ func QueryDB(productid string, merchantid string, q string, values map[string][]
 		costPrice,
 		singleMap["collectionid"],
 		quantityAvailable,
-		fmt.Sprint(merchantid),
+		fmt.Sprint(userID),
 	}
 	// call stored procedure
 	_, err = DB.Exec(
@@ -141,7 +141,7 @@ func AddToStorage(productid string, files []*multipart.FileHeader) error {
 }
 
 func ProductHandlerPOST(w http.ResponseWriter, r *http.Request) {
-	merchantID := r.Header.Get("merchantID")
+	userID := r.Header.Get("userID")
 	productID := uuid.NewString()
 	if err := r.ParseMultipartForm(128 << 20); err != nil {
 		log.Println(err)
@@ -151,7 +151,7 @@ func ProductHandlerPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	formdata := r.MultipartForm
 	q := "CALL ADD_PRODUCT(?,?,?,?,?,?,?,?,?)"
-	if err := QueryDB(productID, fmt.Sprint(merchantID), q, formdata.Value); err != nil {
+	if err := QueryDB(productID, fmt.Sprint(userID), q, formdata.Value); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
@@ -169,7 +169,7 @@ func ProductHandlerPOST(w http.ResponseWriter, r *http.Request) {
 
 func ProductHandlerPUT(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	merchantID := r.Header.Get("merchantID")
+	userID := r.Header.Get("userID")
 	productID := vars["id"]
 	if err := r.ParseMultipartForm(128 << 20); err != nil {
 		log.Println(err)
@@ -179,7 +179,7 @@ func ProductHandlerPUT(w http.ResponseWriter, r *http.Request) {
 	}
 	formdata := r.MultipartForm
 	q := "CALL EDIT_PRODUCT(?,?,?,?,?,?,?,?,?)"
-	if err := QueryDB(productID, fmt.Sprint(merchantID), q, formdata.Value); err != nil {
+	if err := QueryDB(productID, fmt.Sprint(userID), q, formdata.Value); err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))

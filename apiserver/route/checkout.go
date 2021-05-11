@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/checkout/session"
 	"io/ioutil"
@@ -73,6 +74,54 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		confirmed.OrderQuantity = v.OrderQuantity
 		confirmedList = append(confirmedList, confirmed)
 	}
+	// Write order to ORDERITEM
+	orderID := uuid.NewString()
+	userID := r.Header.Get("userID")
+	totalPrice := 0.0
+	for _, v := range confirmedList {
+		totalPrice += v.SellingPrice * float64(v.OrderQuantity)
+	}
+	log.Println("Total Price: ", totalPrice)
+	q := "INSERT INTO ORDERITEM(ORDERITEM_ID,CUSTOMER_ID,TOTALPRICE) VALUES (?,?,?);"
+	res, err := DB.Exec(q, orderID, userID, totalPrice)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected == 0 {
+		log.Printf("%s or 0 rows affected\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// write order to PRODUCT_ORDERITEM
+	for _, v := range confirmedList {
+		q := "INSERT INTO PRODUCT_ORDERITEM(PRODUCT_ID,ORDERITEM_ID,QUANTITY,SELLINGPRICE) VALUES (?,?,?,?);"
+		res, err := DB.Exec(q, v.ProductID, orderID, v.OrderQuantity, v.SellingPrice)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected == 0 {
+			log.Printf("%s or 0 rows affected\n", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		// write order to PRODUCT
+		q = "UPDATE PRODUCT_QUANTITY SET QUANTITYAVAILABLE = QUANTITYAVAILABLE - (?) WHERE PRODUCT_ID = (?) AND QUANTITYAVAILABLE>=(?);"
+		res, err = DB.Exec(q, v.OrderQuantity, v.ProductID, v.OrderQuantity)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected == 0 {
+			log.Printf("%s or 0 rows affected\n", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
 	// stripe integration
 	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	LineItems := []*stripe.CheckoutSessionLineItemParams{}
@@ -103,8 +152,7 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		SuccessURL: stripe.String("https://www.google.com/"),
 		CancelURL:  stripe.String("https://www.bing.com/"),
 	}
-	// TODO design metadata field
-	params.AddMetadata("ProductID", "Calvin")
+	params.AddMetadata("SimpleStoreOrderID", orderID)
 	session, err := session.New(params)
 	if err != nil {
 		log.Printf("session.New: %v", err)
