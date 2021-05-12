@@ -161,5 +161,3 @@ func (D *DataStore) GetData() {
 		return (*D)[i].Created.After((*D)[j].Created)
 	})
 }
-
-func (D *DataStore) GetShipping() {}

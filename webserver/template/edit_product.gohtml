@@ -4,11 +4,11 @@
     <form enctype="multipart/form-data" method="post" action="/admin/edit_product/{{ .Product.ProductID }}">
         <div class="mb-3">
             <label for="title" class="form-label">Title</label>
-            <input class="form-control form-control-sm" type="text" name="title" id="title" placeholder="{{ .Product.Title }}" value="{{ .Product.Title }}">
+            <input class="form-control form-control-sm" type="text" name="title" id="title" placeholder="{{ .Product.Title }}" value="{{ .Product.Title }}" required>
         </div>
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
-            <textarea class="form-control form-control-sm" name="description" id="description" rows="5" placeholder="{{ .Product.Description }}">{{ .Product.Description }}</textarea>
+            <textarea class="form-control form-control-sm" name="description" id="description" rows="5" placeholder="{{ .Product.Description }}" required>{{ .Product.Description }}</textarea>
         </div>
         <div class="text-danger">Product needs at least one picture. Not allowed to delete if only one picture left.</div>
         {{ $top := .Product }}
@@ -22,21 +22,21 @@
         {{ end }}
         <div class="mb-3">
             <label for="media" class="form-label">Add More Media</label>
-            <input class="form-control form-control-sm" type="file" name="media[]" id="media" aria-describedby="mediaHelp" multiple>
+            <input class="form-control form-control-sm" type="file" name="media[]" id="media" aria-describedby="mediaHelp" multiple required>
             <div id="mediaHelp" class="form-text">Hold Ctrl or Command to select multiple files</div>
         </div>
         <div class="mb-3">
             <label for="sellingprice" class="form-label">Selling Price</label>
             <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control form-control-sm" name="sellingprice" id="sellingprice" min="0.00" step="0.01" value="{{ printf "%.2f" .Product.SellingPrice }}">
+                <input type="number" class="form-control form-control-sm" name="sellingprice" id="sellingprice" min="0.00" step="0.01" value="{{ printf "%.2f" .Product.SellingPrice }}" required>
             </div>
         </div>
         <div class="mb-3">
             <label for="discountedprice" class="form-label">Discounted Price</label>
             <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control form-control-sm" name="discountedprice" id="discountedprice" min="0.00" step="0.01" aria-describedby="discountedHelp" value="{{ printf "%.2f" .Product.DiscountedPrice }}">
+                <input type="number" class="form-control form-control-sm" name="discountedprice" id="discountedprice" min="0.00" step="0.01" aria-describedby="discountedHelp" value="{{ printf "%.2f" .Product.DiscountedPrice }}" required>
             </div>
             <div id="discountedHelp" class="form-text">If no discount, set to same price as selling price</div>
         </div>
@@ -44,16 +44,16 @@
             <label for="costprice" class="form-label">Cost Price</label>
             <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control form-control-sm" name="costprice" id="costprice" min="0.00" step="0.01" value="{{ printf "%.2f" .Product.CostPrice }}">
+                <input type="number" class="form-control form-control-sm" name="costprice" id="costprice" min="0.00" step="0.01" value="{{ printf "%.2f" .Product.CostPrice }}" required>
             </div>
         </div>
         <div class="mb-3">
             <label for="quantityavailable" class="form-label">Quantity Available</label>
-            <input type="number" class="form-control form-control-sm" name="quantityavailable" id="quantityavailable" value="{{ .Product.QuantityAvailable }}">
+            <input type="number" class="form-control form-control-sm" name="quantityavailable" id="quantityavailable" value="{{ .Product.QuantityAvailable }}" required>
         </div>
         <div class="mb-3">
             <label for="collectionid" class="form-label">Collection</label>
-            <input type="text" class="form-control form-control-sm" name="collectionid" id="collectionid" placeholder="{{ .Product.CollectionID }}" value="{{ .Product.CollectionID }}">
+            <input type="text" class="form-control form-control-sm" name="collectionid" id="collectionid" placeholder="{{ .Product.CollectionID }}" value="{{ .Product.CollectionID }}" required>
         </div>
         {{ .csrfField }}
         <button type="submit" class="btn btn-primary">Edit Product</button>

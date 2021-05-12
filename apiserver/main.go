@@ -12,9 +12,8 @@ import (
 func main() {
 	dbCloser := SetupDB()
 	defer dbCloser()
-
 	r := mux.NewRouter()
-	protected := r.Host("localhost:8080").Subrouter()
+	protected := r.Host(":8080").Subrouter()
 	protected.HandleFunc("/api/v1/product", ProductHandlerPOST).Methods("POST")
 	protected.HandleFunc("/api/v1/product/{id}", ProductHandlerPUT).Methods("PUT")
 	protected.HandleFunc("/api/v1/product/{id}", ProductHandlerDELETE).Methods("DELETE")
@@ -22,7 +21,6 @@ func main() {
 	protected.HandleFunc("/api/v1/checkout", CheckoutHandler).Methods("POST")
 	protected.HandleFunc("/api/v1/checkout/{id}", CheckoutCancelHandler).Methods("PUT")
 	protected.Use(Validation)
-	r.HandleFunc("/api/v1/checkout-webhook", CheckoutWebhookHandler).Methods("POST")
 	r.HandleFunc("/api/v1/data", DataHandler).Methods("GET")
 	r.HandleFunc("/api/v1/collection", CollectionHandler).Methods("GET")
 	r.HandleFunc("/api/v1/refresh", RefreshHandler).Methods("POST")

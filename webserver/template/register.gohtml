@@ -16,29 +16,29 @@
     </div>
     <div class="mb-3">
       <label for="email" class="form-label">Email</label>
-      <input class="form-control form-control-sm" type="email" name="email" id="email" placeholder="user@example.com">
+      <input class="form-control form-control-sm" type="email" name="email" id="email" placeholder="user@example.com" required>
     </div>
     <div class="mb-3">
       <label for="password" class="form-label">Password</label>
-      <input class="form-control form-control-sm" type="password" name="password" id="password" aria-describedby="passwordHelp">
+      <input class="form-control form-control-sm" type="password" name="password" id="password" aria-describedby="passwordHelp" minlength="6" required>
       <div id="passwordHelp" class="form-text">Min 6 characters</div>
     </div>
     <div class="mb-3">
       <label for="password2" class="form-label">Confirm Password</label>
-      <input class="form-control form-control-sm" type="password" name="password2" id="password2" aria-describedby="passwordHelp2">
+      <input class="form-control form-control-sm" type="password" name="password2" id="password2" aria-describedby="passwordHelp2" minlength="6" required>
       <div id="passwordHelp2" class="form-text">Have to be same as password above</div>
     </div>
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>
-      <input class="form-control form-control-sm" type="text" name="name" id="name">
+      <input class="form-control form-control-sm" type="text" name="name" id="name" required>
     </div>
     <div class="mb-3">
       <label for="address" class="form-label">Address</label>
-      <input class="form-control form-control-sm" type="text" name="address" id="address">
+      <input class="form-control form-control-sm" type="text" name="address" id="address" required>
     </div>
     <div class="mb-3">
       <label for="phone" class="form-label">Phone</label>
-      <input class="form-control form-control-sm" type="text" name="phone" id="phone">
+      <input class="form-control form-control-sm" type="text" name="phone" id="phone" required>
     </div>
     {{ .csrfField }}
     <button type="submit" class="btn btn-primary">Register</button>

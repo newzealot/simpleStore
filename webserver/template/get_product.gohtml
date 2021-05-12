@@ -62,7 +62,7 @@
                                 <label for="orderquantity" class="form-label">Order Quantity</label>
                             </div>
                             <div class="col-sm-2">
-                                <input type="number" class="form-control form-control-sm" name="orderquantity" id="orderquantity" value="1" min="1" max="{{ .Product.QuantityAvailable }}">
+                                <input type="number" class="form-control form-control-sm" name="orderquantity" id="orderquantity" value="1" min="1" max="{{ .Product.QuantityAvailable }}" required>
                             </div>
                             <div class="col-sm">
                                 <label for="orderquantity" class="form-label">{{ .Product.QuantityAvailable }} available</label>
