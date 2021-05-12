@@ -7,7 +7,7 @@
             <tr>
                 <td>Title</td>
                 <td>Quantity Ordered</td>
-                <td>Selling Price</td>
+                <td>Price</td>
                 <td>SubTotal</td>
                 <td>Delete</td>
             </tr>
@@ -17,15 +17,15 @@
                 <tr>
                     <td>{{ $v.Title }}</td>
                     <td>{{ $v.OrderQuantity }}</td>
-                    <td>{{ $v.SellingPrice }}</td>
-                    <td>{{ $v.SubTotal }}</td>
+                    <td>${{ printf "%.2f" $v.DiscountedPrice }}</td>
+                    <td>${{ printf "%.2f" $v.SubTotal }}</td>
                     <td><a href="/cart?delete={{ $v.ProductID }}">Delete</a></td>
                 </tr>
             {{ end }}
             </tbody>
         </table>
         <div class="my-5">
-            Total Price: {{ printf "%.2f" .Total }}
+            Total Price: ${{ printf "%.2f" .Total }}
         </div>
         {{ .csrfField }}
         {{ if ne .User.Type "customer"}}

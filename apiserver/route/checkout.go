@@ -16,11 +16,11 @@ import (
 )
 
 type Order struct {
-	ProductID     string
-	Title         string
-	OrderQuantity int
-	SellingPrice  float64
-	SubTotal      float64
+	ProductID       string
+	Title           string
+	OrderQuantity   int
+	DiscountedPrice float64
+	SubTotal        float64
 }
 
 type ConfirmedOrder struct {
@@ -28,7 +28,7 @@ type ConfirmedOrder struct {
 	Title             string
 	OrderQuantity     int
 	QuantityAvailable int
-	SellingPrice      float64
+	DiscountedPrice   float64
 	FileName          string
 }
 
@@ -55,19 +55,19 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	for _, v := range orderList {
 		q := "CALL GET_PRODUCT_FOR_PAYMENT(?)"
 		row := DB.QueryRow(q, v.ProductID)
-		if err := row.Scan(&confirmed.ProductID, &confirmed.Title, &confirmed.FileName, &confirmed.SellingPrice, &confirmed.QuantityAvailable); err != nil {
+		if err := row.Scan(&confirmed.ProductID, &confirmed.Title, &confirmed.FileName, &confirmed.DiscountedPrice, &confirmed.QuantityAvailable); err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		confirmed.FileName = fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), confirmed.ProductID, url.QueryEscape(confirmed.FileName))
-		if confirmed.SellingPrice != v.SellingPrice {
-			log.Println(err)
+		if confirmed.DiscountedPrice != v.DiscountedPrice {
+			log.Println("Price not equal")
 			w.WriteHeader(http.StatusConflict)
 			return
 		}
 		if confirmed.QuantityAvailable < v.OrderQuantity {
-			log.Println(err)
+			log.Println("Quantity not enough")
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
@@ -79,7 +79,7 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("userID")
 	totalPrice := 0.0
 	for _, v := range confirmedList {
-		totalPrice += v.SellingPrice * float64(v.OrderQuantity)
+		totalPrice += v.DiscountedPrice * float64(v.OrderQuantity)
 	}
 	q := "INSERT INTO ORDERITEM(ORDERITEM_ID,CUSTOMER_ID,TOTALPRICE,STATUS) VALUES (?,?,?,?);"
 	res, err := DB.Exec(q, orderID, userID, totalPrice, "Awaiting Payment")
@@ -95,8 +95,8 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// write order to PRODUCT_ORDERITEM
 	for _, v := range confirmedList {
-		q := "INSERT INTO PRODUCT_ORDERITEM(PRODUCT_ID,ORDERITEM_ID,QUANTITY,SELLINGPRICE) VALUES (?,?,?,?);"
-		res, err := DB.Exec(q, v.ProductID, orderID, v.OrderQuantity, v.SellingPrice)
+		q := "INSERT INTO PRODUCT_ORDERITEM(PRODUCT_ID,ORDERITEM_ID,QUANTITY,DISCOUNTEDPRICE) VALUES (?,?,?,?);"
+		res, err := DB.Exec(q, v.ProductID, orderID, v.OrderQuantity, v.DiscountedPrice)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -132,7 +132,7 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 					Name:   stripe.String(v.Title),
 					Images: stripe.StringSlice([]string{v.FileName}),
 				},
-				UnitAmount: stripe.Int64(int64(v.SellingPrice * 100)),
+				UnitAmount: stripe.Int64(int64(v.DiscountedPrice * 100)),
 			},
 			Quantity: stripe.Int64(int64(v.OrderQuantity)),
 		}

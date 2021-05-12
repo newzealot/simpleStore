@@ -57,7 +57,7 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		log.Println(err)
+		log.Println(resp.StatusCode)
 		http.Redirect(w, r, "/cart?error=Something went wrong", http.StatusSeeOther)
 		return
 	}

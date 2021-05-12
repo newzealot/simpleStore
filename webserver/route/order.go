@@ -11,11 +11,11 @@ import (
 )
 
 type Order struct {
-	ProductID     string
-	Title         string
-	OrderQuantity int
-	SellingPrice  float64
-	SubTotal      float64
+	ProductID       string
+	Title           string
+	OrderQuantity   int
+	DiscountedPrice float64
+	SubTotal        float64
 }
 
 func OrderPOST(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +23,7 @@ func OrderPOST(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	t := r.PostFormValue("title")
 	oq, err := strconv.Atoi(r.PostFormValue("orderquantity"))
-	sp, err := strconv.ParseFloat(r.PostFormValue("sellingprice"), 64)
+	dp, err := strconv.ParseFloat(r.PostFormValue("discountedprice"), 64)
 	if err != nil {
 		log.Println(err)
 		http.Redirect(w, r, "/product/"+vars["id"]+"error?Order quantity not integer", http.StatusSeeOther)
@@ -33,8 +33,8 @@ func OrderPOST(w http.ResponseWriter, r *http.Request) {
 		vars["id"],
 		t,
 		oq,
-		sp,
-		float64(oq) * sp,
+		dp,
+		float64(oq) * dp,
 	}
 	orderList := []Order{}
 	cart, err := r.Cookie("Cart")
