@@ -32,7 +32,6 @@ func DeleteMediaGET(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp.Body.Close()
-	log.Println("Media deleted successfully")
 	D.GetData()
 	http.Redirect(w, r, "/admin/edit_product/"+vars["id"]+"?success=Media deleted successfully", http.StatusSeeOther)
 }

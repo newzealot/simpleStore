@@ -53,6 +53,5 @@ func RegisterPOST(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	log.Println("Registration successful")
 	http.Redirect(w, r, "/login?info=Please check your email, click the confirmation link, then login here", http.StatusSeeOther)
 }

@@ -57,7 +57,6 @@ func DeleteProductPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp.Body.Close()
-	log.Println("Product deleted successfully")
 	D.GetData()
 	http.Redirect(w, r, "/admin?success=Product deleted successfully", http.StatusSeeOther)
 }

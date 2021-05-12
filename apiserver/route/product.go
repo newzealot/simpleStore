@@ -28,9 +28,7 @@ func QueryDB(productid string, userID string, q string, values map[string][]stri
 			return fmt.Errorf("empty value in form")
 		}
 		singleMap[k] = values[k][0][1 : len(values[k][0])-1]
-		log.Println(singleMap[k])
 	}
-	log.Println(userID)
 	sellingPrice, err := strconv.ParseFloat(singleMap["sellingprice"], 64)
 	if err != nil {
 		return err
@@ -77,7 +75,6 @@ func QueryDB(productid string, userID string, q string, values map[string][]stri
 	if err != nil {
 		return err
 	}
-	log.Printf("%s inserted into DB successfully\n", productid)
 	return nil
 }
 
@@ -116,7 +113,6 @@ func AddToStorage(productid string, files []*multipart.FileHeader) error {
 			file.Close()
 			return err
 		}
-		log.Printf("Upload Successful - %s", storageKey)
 		file.Close()
 		pm := ProductMedia{
 			ProductID: productid,
@@ -135,7 +131,6 @@ func AddToStorage(productid string, files []*multipart.FileHeader) error {
 			log.Printf("%s or 0 rows affected\n", err)
 			return fmt.Errorf("%s or 0 rows affected\n", err)
 		}
-		log.Printf("%s/%s inserted into DB successfully\n", v.ProductID, v.Filename)
 	}
 	return nil
 }

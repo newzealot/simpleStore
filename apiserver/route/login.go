@@ -45,7 +45,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	log.Printf("Login successful - %s\n", username)
 	j, err := json.Marshal(*res.AuthenticationResult)
 	if err != nil {
 		log.Println(err)

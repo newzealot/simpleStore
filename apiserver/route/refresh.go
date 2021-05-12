@@ -39,7 +39,6 @@ func RefreshHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Println("Refresh successful")
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(j)
 }

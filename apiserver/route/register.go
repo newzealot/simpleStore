@@ -22,7 +22,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	address := r.Form.Get("address")
 	phone := r.Form.Get("phone")
 	name := r.Form.Get("name")
-	log.Println(userType)
 	if password != password2 {
 		log.Println("Unable to register user - Passwords do not match")
 		w.WriteHeader(http.StatusBadRequest)
@@ -78,6 +77,5 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	log.Printf("Successfully registered %s in Cognito\n", username)
 	return
 }
