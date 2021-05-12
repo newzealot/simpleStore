@@ -1,12 +1,4 @@
 {{ define "content" }}
-<div class="sidenav navbar-light bg-light d-none d-lg-block">
-    <ul class="navbar-nav ms-auto ps-4">
-        <li class="nav-item">
-            <a class="nav-link active" href="/admin">Product</a>
-            <a class="nav-link active" href="/admin/shipping">Shipping</a>
-        </li>
-    </ul>
-</div>
 <div class="main">
     <h2 class="my-4">Add Product</h2>
     <form enctype="multipart/form-data" method="post" action="/admin/add_product">
@@ -20,7 +12,7 @@
         </div>
         <div class="mb-3">
             <label for="media" class="form-label">Media</label>
-            <input class="form-control form-control-sm" type="file" name="media[]" id="media" aria-describedby="mediaHelp" multiple required>
+            <input class="form-control form-control-sm" type="file" name="media[]" id="media" aria-describedby="mediaHelp" accept="image/*" multiple required>
             <div id="mediaHelp" class="form-text">Hold Ctrl or Command to select multiple files</div>
         </div>
         <div class="mb-3">

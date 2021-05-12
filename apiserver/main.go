@@ -13,7 +13,7 @@ func main() {
 	dbCloser := SetupDB()
 	defer dbCloser()
 	r := mux.NewRouter()
-	protected := r.Host(":8080").Subrouter()
+	protected := r.Host("localhost:8080").Subrouter()
 	protected.HandleFunc("/api/v1/product", ProductHandlerPOST).Methods("POST")
 	protected.HandleFunc("/api/v1/product/{id}", ProductHandlerPUT).Methods("PUT")
 	protected.HandleFunc("/api/v1/product/{id}", ProductHandlerDELETE).Methods("DELETE")
