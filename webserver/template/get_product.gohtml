@@ -58,10 +58,10 @@
                 <div class="py-4">{{ .Product.Description }}</div>
                 <form method="post" action="/order/{{ .Product.ProductID }}">
                     <div class="row g-3 d-flex">
-                            <div class="col-sm-3">
+                            <div class="col-sm-2">
                                 <label for="orderquantity" class="form-label">Order Quantity</label>
                             </div>
-                            <div class="col-sm-2">
+                            <div class="col-sm-3">
                                 <input type="number" class="form-control form-control-sm" name="orderquantity" id="orderquantity" value="1" min="1" max="{{ .Product.QuantityAvailable }}" required>
                             </div>
                             <div class="col-sm">
