@@ -53,7 +53,20 @@ func OrderPOST(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	orderList = append(orderList, order)
+	log.Println(orderList)
+	alreadyInList := false
+	for i, v := range orderList {
+		if v.ProductID == order.ProductID {
+			log.Println(v)
+			orderList[i].OrderQuantity = v.OrderQuantity + order.OrderQuantity
+			alreadyInList = true
+			log.Println(v)
+		}
+	}
+	if alreadyInList == false {
+		orderList = append(orderList, order)
+	}
+	log.Println(orderList)
 	j, err := json.Marshal(orderList)
 	jbase := base64.StdEncoding.EncodeToString(j)
 	if err != nil {
