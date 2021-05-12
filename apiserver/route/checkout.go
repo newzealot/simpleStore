@@ -145,8 +145,8 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		}),
 		LineItems:  LineItems,
 		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String("http://00d4a4591c7f.ngrok.io/checkout-success?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:  stripe.String("http://00d4a4591c7f.ngrok.io/checkout-cancel?session_id={CHECKOUT_SESSION_ID}"),
+		SuccessURL: stripe.String(os.Getenv("WEBSERVER") + "/checkout-success?session_id={CHECKOUT_SESSION_ID}"),
+		CancelURL:  stripe.String(os.Getenv("WEBSERVER") + "/checkout-cancel?session_id={CHECKOUT_SESSION_ID}"),
 	}
 	params.AddMetadata("SimpleStoreOrderID", orderID)
 	session, err := session.New(params)
