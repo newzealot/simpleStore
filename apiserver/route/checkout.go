@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/checkout/session"
 	"io/ioutil"
@@ -60,7 +61,6 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		confirmed.FileName = fmt.Sprintf("%s%s/%s", os.Getenv("AWS_S3_URL_PREFIX"), confirmed.ProductID, url.QueryEscape(confirmed.FileName))
-		log.Println(confirmed.FileName)
 		if confirmed.SellingPrice != v.SellingPrice {
 			log.Println(err)
 			w.WriteHeader(http.StatusConflict)
@@ -81,9 +81,8 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	for _, v := range confirmedList {
 		totalPrice += v.SellingPrice * float64(v.OrderQuantity)
 	}
-	log.Println("Total Price: ", totalPrice)
-	q := "INSERT INTO ORDERITEM(ORDERITEM_ID,CUSTOMER_ID,TOTALPRICE) VALUES (?,?,?);"
-	res, err := DB.Exec(q, orderID, userID, totalPrice)
+	q := "INSERT INTO ORDERITEM(ORDERITEM_ID,CUSTOMER_ID,TOTALPRICE,STATUS) VALUES (?,?,?,?);"
+	res, err := DB.Exec(q, orderID, userID, totalPrice, "Awaiting Payment")
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -130,10 +129,7 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 			PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
 				Currency: stripe.String(string(stripe.CurrencySGD)),
 				ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
-					Name: stripe.String(v.Title),
-					//Metadata: map[string]string{
-					//	"ProductID": v.ProductID,
-					//},
+					Name:   stripe.String(v.Title),
 					Images: stripe.StringSlice([]string{v.FileName}),
 				},
 				UnitAmount: stripe.Int64(int64(v.SellingPrice * 100)),
@@ -149,8 +145,8 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		}),
 		LineItems:  LineItems,
 		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String("https://www.google.com/"),
-		CancelURL:  stripe.String("https://www.bing.com/"),
+		SuccessURL: stripe.String("http://00d4a4591c7f.ngrok.io/checkout-success?session_id={CHECKOUT_SESSION_ID}"),
+		CancelURL:  stripe.String("http://00d4a4591c7f.ngrok.io/checkout-cancel?session_id={CHECKOUT_SESSION_ID}"),
 	}
 	params.AddMetadata("SimpleStoreOrderID", orderID)
 	session, err := session.New(params)
@@ -164,4 +160,52 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 	return
+}
+
+func CheckoutCancelHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	orderID := vars["id"]
+	// find out affected product_id and quantity
+	q := "SELECT PRODUCT_ID, QUANTITY FROM PRODUCT_ORDERITEM WHERE ORDERITEM_ID = (?)"
+	rows, err := DB.Query(q, orderID)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var productID string
+		var quantityOrdered int
+		if err := rows.Scan(&productID, &quantityOrdered); err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		// reverting
+		q = "UPDATE PRODUCT_QUANTITY SET QUANTITYAVAILABLE = QUANTITYAVAILABLE + (?) WHERE PRODUCT_ID = (?)"
+		res, err := DB.Exec(q, quantityOrdered, productID)
+		if err != nil {
+			log.Println(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected == 0 {
+			log.Printf("product_quantity %s or 0 rows affected\n", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+	q = "UPDATE ORDERITEM SET STATUS = (?) WHERE ORDERITEM_ID = (?);"
+	res, err := DB.Exec(q, "Cancelled", orderID)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected == 0 {
+		log.Printf("orderitem%s or 0 rows affected\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

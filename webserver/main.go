@@ -24,6 +24,8 @@ func main() {
 	protected.HandleFunc("/admin/delete_media/{id}/{filename}", DeleteMediaGET).Methods("GET")
 	protected.Use(AccessTokenCheck)
 	r.HandleFunc("/checkout", CheckoutPOST).Methods("POST")
+	r.HandleFunc("/checkout-success", CheckoutSuccessGET).Methods("GET")
+	r.HandleFunc("/checkout-cancel", CheckoutCancelGET).Methods("GET")
 	r.HandleFunc("/about", AboutGET).Methods("GET")
 	r.HandleFunc("/cart", CartGET).Methods("GET")
 	r.HandleFunc("/login", LoginGET).Methods("GET")

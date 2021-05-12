@@ -12,7 +12,6 @@ import (
 // GetUserInfo is similar to AccessTokenCheck except that it does not block access
 func GetUserInfo(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("AccessTokenCheck")
 		rt, err := r.Cookie("RefreshToken")
 		if err != nil {
 			next.ServeHTTP(w, r)
@@ -71,7 +70,6 @@ func GetUserInfo(next http.Handler) http.Handler {
 			http.SetCookie(w, &c1)
 			http.SetCookie(w, &c2)
 			at = &c1
-			log.Println("Cookies set")
 			http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
 			return
 		}

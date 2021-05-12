@@ -89,7 +89,6 @@ func EditProductPOST(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	log.Printf("Successfully added product")
 	D.GetData()
 	http.Redirect(w, r, r.URL.Path+"?success=Successfully edited product", http.StatusSeeOther)
 	return

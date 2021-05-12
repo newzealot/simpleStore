@@ -20,7 +20,6 @@ func CollectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer rows.Close()
-
 	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {

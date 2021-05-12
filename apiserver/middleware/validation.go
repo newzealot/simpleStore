@@ -27,7 +27,6 @@ func VerifyAccessToken(at string) (string, error) {
 		jwt.WithClaimValue("token_use", "access"),
 	)
 	if err != nil {
-		log.Println("here")
 		return "", err
 	}
 	m, ok := p.Get("username")
@@ -39,7 +38,6 @@ func VerifyAccessToken(at string) (string, error) {
 
 func Validation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("ValidationMiddleWare")
 		at := r.Header.Get("Authorization")
 		at = strings.Replace(at, "Bearer ", "", 1)
 		userID, err := VerifyAccessToken(at)
