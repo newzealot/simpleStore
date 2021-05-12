@@ -53,7 +53,6 @@ func VerifyAccessToken(token_use string, at string) (UserInfo, error) {
 // AccessTokenCheck makes sure that protected route contains a valid Access Token.
 func AccessTokenCheck(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("AccessTokenCheck")
 		rt, err := r.Cookie("RefreshToken")
 		if err != nil {
 			log.Printf("RefreshToken error - %s\n", err)
@@ -134,7 +133,6 @@ func AccessTokenCheck(next http.Handler) http.Handler {
 			http.Redirect(w, r, "/login?status="+"Please login first", http.StatusSeeOther)
 			return
 		}
-		log.Println("AccessToken and IdToken valid")
 		if u.Type == "customer" {
 			log.Println("Trying to access admin as customer")
 			http.Redirect(w, r, "/?error=Trying to access admin as customer", http.StatusSeeOther)

@@ -15,6 +15,7 @@ func main() {
 	r := mux.NewRouter()
 	protected := r.Host("localhost:5000").Subrouter()
 	protected.HandleFunc("/admin", AdminGET).Methods("GET")
+	protected.HandleFunc("/admin/shipping", ShippingGET).Methods("GET")
 	protected.HandleFunc("/admin/add_product", AddProductGET).Methods("GET")
 	protected.HandleFunc("/admin/add_product", AddProductPOST).Methods("POST")
 	protected.HandleFunc("/admin/edit_product/{id}", EditProductGET).Methods("GET")
