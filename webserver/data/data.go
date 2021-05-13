@@ -144,6 +144,8 @@ func (D *DataStore) GetData() {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
+		time.Sleep(3 * time.Second)
+		D.GetData()
 		return
 	}
 	defer resp.Body.Close()

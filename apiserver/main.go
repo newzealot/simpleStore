@@ -20,7 +20,7 @@ func main() {
 	protected.HandleFunc("/api/v1/media/{id}/{filename}", MediaHandlerDELETE).Methods("DELETE")
 	protected.HandleFunc("/api/v1/checkout", CheckoutHandler).Methods("POST")
 	protected.HandleFunc("/api/v1/checkout/{id}", CheckoutCancelHandler).Methods("PUT")
-	protected.Use(Validation)
+	protected.Use(ValidateAccessToken)
 	r.HandleFunc("/api/v1/data", DataHandler).Methods("GET")
 	r.HandleFunc("/api/v1/collection", CollectionHandler).Methods("GET")
 	r.HandleFunc("/api/v1/refresh", RefreshHandler).Methods("POST")
