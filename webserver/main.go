@@ -13,6 +13,7 @@ import (
 func main() {
 	D.GetData()
 	r := mux.NewRouter()
+	// personal preference for not using r.Prefix, as "/admin" will become "" and difficult to understand
 	admin := r.Host("localhost:5000").Subrouter()
 	admin.HandleFunc("/admin", AdminGET).Methods("GET")
 	admin.HandleFunc("/admin/add_product", AddProductGET).Methods("GET")
@@ -23,6 +24,7 @@ func main() {
 	admin.HandleFunc("/admin/delete_product/{id}", DeleteProductPOST).Methods("POST")
 	admin.HandleFunc("/admin/delete_media/{id}/{filename}", DeleteMediaGET).Methods("GET")
 	admin.Use(AllowOnlyMerchant)
+	// keeping use of r.Host consistent
 	customer := r.Host("localhost:5000").Subrouter()
 	customer.HandleFunc("/customer/checkout", CheckoutPOST).Methods("POST")
 	customer.Use(AllowOnlyCustomer)

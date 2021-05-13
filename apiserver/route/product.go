@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -193,6 +194,11 @@ func ProductHandlerPUT(w http.ResponseWriter, r *http.Request) {
 func ProductHandlerDELETE(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	productID := vars["id"]
+	if err := DeleteFromStorage(productID); err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	q := "DELETE FROM PRODUCT WHERE PRODUCT_ID = (?)"
 	_, err := DB.Exec(q, productID)
 	if err != nil {
@@ -200,4 +206,41 @@ func ProductHandlerDELETE(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+}
+
+func DeleteFromStorage(productID string) error {
+	sess, err := session.NewSession()
+	if err != nil {
+		return err
+	}
+	svc := s3.New(sess)
+	resp, err := svc.ListObjectsV2(&s3.ListObjectsV2Input{
+		Bucket: aws.String(os.Getenv("AWS_S3_BUCKET_NAME")),
+		Prefix: aws.String(productID),
+	})
+	if err != nil {
+		return err
+	}
+	key := []string{}
+	for _, v := range resp.Contents {
+		key = append(key, *v.Key)
+	}
+	for _, v := range key {
+		_, err = svc.DeleteObject(&s3.DeleteObjectInput{
+			Bucket: aws.String(os.Getenv("AWS_S3_BUCKET_NAME")),
+			Key:    aws.String(v),
+		})
+		if err != nil {
+			return err
+		}
+		err = svc.WaitUntilObjectNotExists(&s3.HeadObjectInput{
+			Bucket: aws.String(os.Getenv("AWS_S3_BUCKET_NAME")),
+			Key:    aws.String(v),
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

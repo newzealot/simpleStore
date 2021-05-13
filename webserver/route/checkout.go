@@ -22,6 +22,7 @@ func CheckoutPOST(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/cart?error=Empty cart", http.StatusSeeOther)
 		return
 	} else {
+		// these steps are just to verify cookie is valid - able to unmarshal into struct
 		j, err := base64.StdEncoding.DecodeString(cart.Value)
 		if err != nil {
 			log.Println(err)
