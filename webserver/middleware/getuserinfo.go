@@ -74,12 +74,12 @@ func GetUserInfo(next http.Handler) http.Handler {
 			return
 		}
 		// verify AccessToken
-		u, err := VerifyAccessToken("access", at.Value)
+		u, err := VerifyToken("access", at.Value)
 		if err != nil {
 			next.ServeHTTP(w, r)
 			return
 		}
-		u, err = VerifyAccessToken("id", it.Value)
+		u, err = VerifyToken("id", it.Value)
 		if err != nil {
 			next.ServeHTTP(w, r)
 			return
@@ -93,23 +93,3 @@ func GetUserInfo(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
-//
-//log.Println("GetUserInfo")
-//it, err := r.Cookie("IdToken")
-//if err != nil {
-//next.ServeHTTP(w, r)
-//return
-//}
-//// verify IdToken
-//u, err := VerifyAccessToken("id", it.Value)
-//if err != nil {
-//next.ServeHTTP(w, r)
-//return
-//}
-//// setting UserInfo in header
-//r.Header.Add("SimpleStoreUserType", u.Type)
-//r.Header.Add("SimpleStoreUserID", u.ID)
-//r.Header.Add("SimpleStoreUserEmail", u.Email)
-//// Call the next handler, which can be another middleware in the chain, or the final handler.
-//next.ServeHTTP(w, r)
