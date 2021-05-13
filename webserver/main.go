@@ -26,7 +26,7 @@ func main() {
 	r.HandleFunc("/checkout", CheckoutPOST).Methods("POST")
 	r.HandleFunc("/checkout-success", CheckoutSuccessGET).Methods("GET")
 	r.HandleFunc("/checkout-cancel", CheckoutCancelGET).Methods("GET")
-	r.HandleFunc("/order/{id}", OrderPOST).Methods("POST")
+	r.HandleFunc("/add_cart/{id}", AddCartPOST).Methods("POST")
 	r.HandleFunc("/about", AboutGET).Methods("GET")
 	r.HandleFunc("/cart", CartGET).Methods("GET")
 	r.HandleFunc("/login", LoginGET).Methods("GET")

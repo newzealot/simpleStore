@@ -18,7 +18,7 @@ type Order struct {
 	SubTotal        float64
 }
 
-func OrderPOST(w http.ResponseWriter, r *http.Request) {
+func AddCartPOST(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	r.ParseForm()
 	t := r.PostFormValue("title")

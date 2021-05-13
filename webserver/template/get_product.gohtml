@@ -56,7 +56,7 @@
                     {{ end }}
                 </h2>
                 <div class="py-4">{{ .Product.Description }}</div>
-                <form method="post" action="/order/{{ .Product.ProductID }}">
+                <form method="post" action="/add_cart/{{ .Product.ProductID }}">
                     <div class="row g-3 d-flex">
                             <div class="col-sm-2">
                                 <label for="orderquantity" class="form-label">Order Quantity</label>
