@@ -24,7 +24,7 @@ func main() {
 	admin.HandleFunc("/admin/delete_media/{id}/{filename}", DeleteMediaGET).Methods("GET")
 	admin.Use(AllowOnlyMerchant)
 	customer := r.Host("localhost:5000").Subrouter()
-	customer.HandleFunc("/checkout", CheckoutPOST).Methods("POST")
+	customer.HandleFunc("/customer/checkout", CheckoutPOST).Methods("POST")
 	customer.Use(AllowOnlyCustomer)
 	r.HandleFunc("/checkout-success", CheckoutSuccessGET).Methods("GET")
 	r.HandleFunc("/checkout-cancel", CheckoutCancelGET).Methods("GET")
