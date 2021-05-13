@@ -22,7 +22,7 @@ func main() {
 	protected.HandleFunc("/admin/delete_product/{id}", DeleteProductGET).Methods("GET")
 	protected.HandleFunc("/admin/delete_product/{id}", DeleteProductPOST).Methods("POST")
 	protected.HandleFunc("/admin/delete_media/{id}/{filename}", DeleteMediaGET).Methods("GET")
-	protected.Use(AllowOnlyMerchant)
+	protected.Use(AccessTokenCheck)
 	r.HandleFunc("/checkout", CheckoutPOST).Methods("POST")
 	r.HandleFunc("/checkout-success", CheckoutSuccessGET).Methods("GET")
 	r.HandleFunc("/checkout-cancel", CheckoutCancelGET).Methods("GET")
