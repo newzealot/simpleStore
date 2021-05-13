@@ -1,0 +1,9 @@
+FROM golang
+
+WORKDIR /go/src/simpleStore
+
+COPY webserver .
+
+EXPOSE 5000
+
+CMD ["./main"]

@@ -1,0 +1,9 @@
+FROM golang
+
+WORKDIR /go/src/simpleStore
+
+COPY apiserver .
+
+EXPOSE 8080
+
+CMD ["./main"]
