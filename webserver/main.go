@@ -5,9 +5,6 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	. "simpleStore/webserver/data"
-	. "simpleStore/webserver/middleware"
-	. "simpleStore/webserver/route"
 )
 
 func main() {
