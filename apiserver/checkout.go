@@ -142,10 +142,11 @@ func CheckoutHandler(w http.ResponseWriter, r *http.Request) {
 		PaymentMethodTypes: stripe.StringSlice([]string{
 			"card",
 		}),
-		LineItems:  LineItems,
-		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String(os.Getenv("WEBSERVER") + "/checkout-success?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:  stripe.String(os.Getenv("WEBSERVER") + "/checkout-cancel?session_id={CHECKOUT_SESSION_ID}"),
+		LineItems: LineItems,
+		Mode:      stripe.String(string(stripe.CheckoutSessionModePayment)),
+		// hardcoded localhost is needed to test as it would not work otherwise
+		SuccessURL: stripe.String("http://localhost:5000/checkout-success?session_id={CHECKOUT_SESSION_ID}"),
+		CancelURL:  stripe.String("http://localhost:5000/checkout-cancel?session_id={CHECKOUT_SESSION_ID}"),
 	}
 	params.AddMetadata("SimpleStoreOrderID", orderID)
 	session, err := session.New(params)
