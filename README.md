@@ -1,7 +1,7 @@
 # simpleStore.
 A simple eCommerce store for individuals to sell homemade goods.
 
-Test out the site here: http://simplestore.newzealot.com/
+Test out the site here: https://simplestore.newzealot.com/
 
 Watch "Demo.mp4" for a preview of the project.
 
